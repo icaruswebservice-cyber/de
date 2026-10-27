@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="es" class="wd-page">
+<head>
+<meta charset="UTF-8">
+<base href="/">
+<link rel="icon" type="image/png" sizes="48x48" href="deriv-d-48.png">
+<link rel="icon" type="image/png" sizes="32x32" href="deriv-d-32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="deriv-d-16.png">
+<link rel="apple-touch-icon" href="deriv-d-180.png">
+<meta name="theme-color" content="#ffffff">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Withdraw | Deriv</title>
+<link rel="stylesheet" href="assets/sim/css/deriv-icons.css?v=20261017zr">
+<link rel="stylesheet" href="assets/sim/css/deriv-withdraw.css?v=20261017zr">
+</head>
+<body class="wd-body" data-scene="/dashboard/withdraw/currency/USD">
+<script src="assets/sim/js/sim-shared.js?v=20261017zr"></script>
+<div class="wd-cashier">
+  <div class="wd-cashier-top"><span></span><span class="wd-ask"><i class="ic ic-amy"></i>Ask Amy</span><button class="wd-xbtn" id="wdClose" aria-label="Cerrar"><svg viewBox="0 0 12 12" width="11" height="11" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="m2.5 2.5 7 7M9.5 2.5l-7 7"/></svg></button></div>
+  <h1 class="wd-title" style="margin-left:0">Retirar USD</h1>
+  <div class="wd-scroll" id="wdScroll">
+    <!-- vista 1: monto + método -->
+    <div id="wdList">
+      <div class="wd-stats">
+        <div class="wd-stat"><span>Saldo Actual</span><b id="wdBal">$ 0.00</b></div>
+        <div class="wd-stat"><span id="wdPendLbl">0 Retiros Pendientes</span><b><em id="wdPend">-$ 0.00</em><svg class="i-doc" viewBox="0 0 16 16"><rect x="2" y="1.5" width="12" height="13" rx="2.4" fill="#cfe0fb" stroke="#3b78e7" stroke-width="1.3"/><circle cx="7.600" cy="7.600" r="2.200" fill="#fff" stroke="#3b78e7" stroke-width="1.3"/><path d="m9.300 9.300 2.300 2.300" stroke="#3b78e7" stroke-width="1.3" stroke-linecap="round"/></svg></b></div>
+        <div class="wd-stat"><span>Saldo Disponible USD</span><b><em id="wdAvail">$ 0.00</em><svg class="i-x" id="wdAvailX" viewBox="0 0 16 16"><circle cx="8" cy="8" r="6.500" fill="#e8334f"/><path d="m5.600 5.600 4.800 4.800M10.400 5.600l-4.800 4.800" stroke="#fff" stroke-width="1.500" stroke-linecap="round"/></svg></b></div>
+      </div>
+      <div class="wd-alert" id="wdAlert"><svg viewBox="0 0 20 20" fill="none" stroke="#555" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6.500 9V4.600a1.100 1.100 0 0 1 2.200 0V8M8.700 8V3.600a1.100 1.100 0 0 1 2.200 0V8M10.900 8V4.400a1.100 1.100 0 0 1 2.200 0V9.500M13.100 7.400a1.100 1.100 0 0 1 2.200 0v4.200a5.500 5.500 0 0 1-5.500 5.500c-2 0-3.300-1-4.500-2.700L3.700 11a1.200 1.200 0 0 1 1.900-1.400L6.500 11"/></svg><div>Su saldo disponible de $ <span id="wdAlertAmt">0.00</span> USD no es suficiente para completar tu solicitud.</div></div>
+      <div class="wd-step"><i>1</i>Enter withdrawal amount</div>
+      <div class="wd-amt" id="wdAmtWrap"><input id="wdAmt" type="text" inputmode="decimal" autocomplete="off" placeholder="0.00"></div>
+      <div class="wd-step s2"><i>2</i>Select a payment method below</div>
+      <div class="wd-methods" id="wdMethods">
+        <div class="wd-method" data-m="binance" data-min="20" data-max="2000"><div class="wd-mlogo"><img src="assets/sim/img/v/binance_pay.png" alt="Binance Pay" class="bn"></div><div class="wd-mtext"><b>Binance Pay</b><p>Realiza retiros fácilmente usando criptomonedas desde tu cuenta fiat.</p><small class="first">Retiro: 1 día hábil</small><small class="max">Máx. $ 2,000</small></div></div>
+        <div class="wd-method" data-m="pse" data-min="1" data-max="1000"><div class="wd-mlogo"><img src="assets/sim/img/v/pse.png" alt="PSE" class="pse"></div><div class="wd-mtext"><b>PSE</b><p>Realiza retiros fácilmente a tu cuenta bancaria.</p><small class="first">Retiro: 1-2 días hábiles</small><small class="max">Máx. $ 1,000</small></div></div>
+      </div>
+      <div class="wd-note"><svg viewBox="0 0 16 16"><circle cx="8" cy="8" r="7" fill="#1f2937"/><path d="M8 7v4.200M8 4.700v.2" stroke="#fff" stroke-width="1.500" stroke-linecap="round"/></svg><div>Para ver todas las opciones de retiro disponibles, por favor, <a href="#" onclick="return false">haga clic aquí</a>. Las opciones de retiro aparecerán aquí según su actividad previa de depósitos en el cajero y la verificación de su cuenta.</div></div>
+    </div>
+    <!-- vista 2: formulario PSE -->
+    <div id="wdForm" hidden>
+      <button class="wd-back" id="wdFormBack" aria-label="Atrás"><svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="#111" stroke-width="2.200" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12H5M11 5.500 4.500 12 11 18.500"/></svg></button>
+      <img class="wd-fpse" src="assets/sim/img/v/pse.png" alt="PSE">
+      <table class="wd-sum"><tr><th>Monto:</th><td id="fAmt">$ 0.00</td></tr><tr><th>Comisión de<br>Procesamiento:</th><td class="fee"><svg viewBox="0 0 16 16" width="16" height="16"><rect x="2" y="6" width="12" height="8.500" rx="1" fill="#f0742f"/><rect x="1.500" y="4" width="13" height="3" rx=".8" fill="#e8334f"/><rect x="7" y="4" width="2" height="10.500" fill="#ffd15c"/><path d="M8 4C6 1.500 4 2.500 5 3.800 5.600 4.500 7.400 4 8 4Zm0 0c2-2.500 4-1.500 3 -.2-.6.700-2.400.2-3 .2Z" fill="#ffd15c"/></svg> Gratis!</td></tr><tr class="tot"><th>Total<br>Debitado USD:</th><td id="fTot">$ 0.00</td></tr></table>
+      <div class="wd-info"><svg viewBox="0 0 16 16"><circle cx="8" cy="8" r="7" fill="#1f2937"/><path d="M8 7v4.200M8 4.700v.2" stroke="#fff" stroke-width="1.500" stroke-linecap="round"/></svg><span>Realiza retiros fácilmente a tu cuenta bancaria.</span></div>
+      <div class="wd-warn"><svg viewBox="0 0 16 16"><circle cx="8" cy="8" r="7.200" fill="#f5a623"/><path d="M8 4.200v4.600M8 10.800v.6" stroke="#fff" stroke-width="1.700" stroke-linecap="round"/></svg><div><p>Tenga en cuenta que los retiros pueden tardar hasta 24 horas.</p><p><b>Antes de enviar la solicitud:</b> Asegúrese de que el número de su cuenta bancaria activa, el tipo de cuenta y el número de identificación coincidan exactamente con los registros de su banco. Los datos incorrectos pueden provocar el rechazo de su retiro.</p></div></div>
+      <div class="wd-fields">
+        <label class="fl"><span><svg class="bk" viewBox="0 0 16 16"><path d="M8 1.500 1.500 5v1.200h13V5L8 1.500ZM3 7.200v4.800h1.700V7.200H3Zm3.300 0v4.800H8V7.200H6.300Zm3.300 0v4.800h1.700V7.200H9.600Zm3.300 0v4.800h.1V7.200h-.1ZM1.500 13v1.300h13V13h-13Z" fill="#555"/></svg> Usado por última vez:</span>
+          <div class="wd-sel" id="wdSel"><div class="cur" id="wdSelCur"></div><button type="button" class="arr" id="wdSelBtn" aria-label="Elegir banco"><svg viewBox="0 0 12 8" width="12" height="8" fill="none" stroke="#777" stroke-width="1.300"><path d="m1.500 1.500 4.500 4.500 4.500-4.500"/></svg></button>
+            <div class="menu" id="wdSelMenu" hidden></div></div></label>
+        <label class="fl"><span>Nombre del beneficiario:</span><div class="inp w265" id="fName"><span id="fNameV"></span><i class="ico-ok"></i></div></label>
+        <label class="fl"><span>Cédula Ciudadanía (CC):</span><div class="inp w265" id="fCc"><span id="fCcV"></span><svg class="ico-id" viewBox="0 0 20 14"><rect x=".5" y=".5" width="19" height="13" rx="2" fill="none" stroke="#8a8a8a"/><circle cx="6" cy="5.500" r="2" fill="#8a8a8a"/><path d="M2.500 11.500c.4-2 5.600-2 7 0" fill="#8a8a8a"/><path d="M11.500 4.500h5M11.500 7h5M11.500 9.500h3.500" stroke="#8a8a8a"/></svg></div></label>
+        <label class="fl"><span>Nombre del Banco:</span><div class="inp w275 bank" id="fBank"><span id="fBankV">NEQUI</span></div></label>
+        <label class="fl"><span>Tipo de Cuenta:</span><div class="inp w275" id="fType"><span>Savings</span></div></label>
+        <label class="fl"><span>Número de Cuenta (CardID):</span><div class="inp w275" id="fAcc"><span id="fAccV"></span></div></label>
+        <label class="fl"><span>Comentarios o Instrucciones:</span><textarea class="ta" placeholder="Comentarios o Instrucciones"></textarea></label>
+        <div class="wd-send"><button type="button" id="wdSend">Enviar Solicitud <svg viewBox="0 0 14 14" width="13" height="13"><circle cx="7" cy="7" r="6" fill="none" stroke="#fff" stroke-width="1.300"/><path d="M4.500 7h5M7.500 5l2 2-2 2" fill="none" stroke="#fff" stroke-width="1.300" stroke-linecap="round" stroke-linejoin="round"/></svg></button></div>
+      </div>
+    </div>
+    <!-- vista 3: confirmación -->
+    <div id="wdDone" hidden>
+      <div class="wd-check" id="wdCheck"><i id="ckHalo"></i><svg viewBox="0 0 80 80" width="80" height="80" fill="none"><circle id="ckFill" cx="40" cy="40" r="19" stroke="#7cd045" stroke-width="38" style="opacity:0"/><circle id="ckRing" cx="40" cy="40" r="38.500" stroke="#7cd045" stroke-width="3" style="stroke-dasharray:0 242"/><path id="ckTick" d="M23 41.500 34 52.500 57.500 28" stroke="#fff" stroke-width="3.200" stroke-linecap="round" stroke-linejoin="round" style="opacity:0"/></svg></div>
+      <h2 class="wd-dt">Confirmación de Solicitud de Retiro de Fondos</h2>
+      <div class="wd-dp"><p><span id="dName"></span><br>Su solicitud de retiro de fondos se ha recibido y será procesada pronto.</p>
+        <table class="wd-dtbl"><tr><th>Id. Cuenta</th><td id="dAcct"></td></tr><tr><th>Método de Retiro de Fondos</th><td><img src="assets/sim/img/v/pse.png" alt="PSE"></td></tr><tr><th>Monto</th><td id="dAmt">$ 0.00</td></tr><tr><th>Fecha de Solicitud</th><td id="dDate"></td></tr><tr><th>ID de rastreo</th><td id="dId"></td></tr></table>
+        <p>Usted puede revisar o cancelar su solicitud de retiro de fondos en línea o mediante contactar a nuestros Representantes de Servicio del Cliente.</p></div>
+      <button class="wd-review" id="wdReview">Revisar los Retiros de Fondos Pendientes</button>
+    </div>
+    <!-- vista 4: solicitudes de retiro pendientes -->
+    <div id="wdPend2" hidden>
+      <button class="wd-back" id="pdBack" aria-label="Atrás"><svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="#111" stroke-width="2.200" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12H5M11 5.500 4.500 12 11 18.500"/></svg></button>
+      <div class="pd-sel">⏳ Solicitud de Retiro de Fondos Pendientes <svg viewBox="0 0 12 8" width="11" height="8" fill="none" stroke="#111" stroke-width="2"><path d="m1.500 1.500 4.500 4.500 4.500-4.500"/></svg></div>
+      <table class="pd-tbl"><thead><tr><th>ID</th><th>Estatus <i>?</i></th><th>Monto</th><th>Método</th><th>Cuenta</th><th>Ult. Actualización</th></tr></thead><tbody id="pdBody"></tbody></table>
+      <p class="pd-total">Total de Solicitudes de Retiro de Fondos: <b id="pdTotal">$ 0.00</b></p>
+      <p class="pd-note">(incluye comisiones de procesamiento)</p>
+      <div class="pd-btn"><button type="button" id="pdCancel">Cancelar las Solicitudes Seleccionadas</button></div>
+    </div>
+    <div class="wd-inspin" id="wdSpin" hidden><i></i></div>
+    <button class="wd-up" id="wdUp" aria-label="Subir"><svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.600" stroke-linecap="round" stroke-linejoin="round"><path d="m3.500 10 4.500-4.500L12.500 10"/></svg></button>
+  </div>
+</div>
+<div class="wd-loader show" id="wdLoader"><div class="wd-ring"><img src="deriv-d-48.png" alt=""></div></div>
+<script src="assets/sim/js/withdraw.js?v=20261017zr"></script>
+</body>
+</html>

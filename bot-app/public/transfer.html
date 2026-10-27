@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="es" class="tf-page">
+<head>
+<meta charset="UTF-8">
+<base href="/">
+<link rel="icon" type="image/png" sizes="48x48" href="deriv-d-48.png">
+<link rel="icon" type="image/png" sizes="32x32" href="deriv-d-32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="deriv-d-16.png">
+<link rel="apple-touch-icon" href="deriv-d-180.png">
+<meta name="theme-color" content="#fdfdfd">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Transfer | Deriv</title>
+<link rel="stylesheet" href="assets/sim/css/deriv-icons.css?v=20261017zr">
+<link rel="stylesheet" href="assets/sim/css/deriv-transfer.css?v=20261017zr">
+</head>
+<body class="tf-body" data-scene="/dashboard/transfer">
+<script src="assets/sim/js/sim-shared.js?v=20261017zr"></script>
+<div class="tf-col">
+  <button class="tf-back" id="tfBack" aria-label="Volver"><i class="ic ic-pr_back"></i></button>
+  <h1 class="tf-h1">Transferir</h1>
+  <div class="tf-info" id="tfInfo">
+    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.2"><circle cx="8" cy="8" r="6.8"/><path d="M8 7v4M8 4.8v.1" stroke-linecap="round"/></svg>
+    <div><p>Hemos actualizado cómo funcionan las transferencias. El proceso ahora es más sencillo y rápido.</p>
+      <div class="acts"><button class="tf-pill" type="button" id="tfSee">Mira lo que cambió</button><button class="tf-link" type="button" id="tfDismiss">Despedir</button></div></div>
+  </div>
+  <div style="position:relative">
+    <button class="tf-acct" id="tfFrom" type="button"></button>
+    <button class="tf-swap" id="tfSwap" type="button" aria-label="Intercambiar" style="top:calc(6rem - 0.4rem)"><svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 13V3M2.5 5.500 5 3l2.500 2.500M11 3v10M8.500 10.500 11 13l2.500-2.500"/></svg></button>
+    <button class="tf-acct" id="tfTo" type="button"></button>
+  </div>
+  <label class="tf-amt-lbl" for="tfAmount">Cantidad</label>
+  <div class="tf-input" id="tfInputBox"><input id="tfAmount" inputmode="decimal" placeholder="0.00" autocomplete="off"><span>USD</span></div>
+  <div class="tf-chips" id="tfChips"><button class="tf-chip" data-p="25" type="button">25%</button><button class="tf-chip" data-p="50" type="button">50%</button><button class="tf-chip" data-p="75" type="button">75%</button><button class="tf-chip" data-p="100" type="button">100%</button></div>
+  <div class="tf-foot"><span class="rec" id="tfRecLbl" style="visibility:hidden">Recibirás</span><div class="right"><span class="val" id="tfRec"></span><button class="tf-go" id="tfGo" type="button" disabled>Transferir</button></div></div>
+  <div class="tf-msg" id="tfMsg"></div>
+</div>
+
+<div class="tf-overlay" id="tfPickOv"><div class="tf-modal tf-pick"><button class="tf-x" id="tfPickX" aria-label="Cerrar"><svg viewBox="0 0 12 12" width="11" height="11" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="m2.500 2.500 7 7M9.500 2.500l-7 7"/></svg></button><h2 id="tfPickTitle">a</h2>
+  <label class="tf-search"><svg viewBox="0 0 16 16" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="7" cy="7" r="4.800"/><path d="m11 11 3.500 3.500"/></svg><input id="tfSearch" placeholder="Buscar" autocomplete="off"></label>
+  <div class="tf-list" id="tfList"></div></div></div>
+
+<div class="tf-overlay" id="tfConfOv"><div class="tf-modal tf-conf"><button class="tf-x" id="tfConfX" aria-label="Cerrar" style="top:1.4rem;right:1.4rem"><svg viewBox="0 0 12 12" width="11" height="11" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="m2.500 2.500 7 7M9.500 2.500l-7 7"/></svg></button>
+  <h2>Revisar y confirmar</h2>
+  <div class="r"><span class="k">De</span><span class="v" id="cFrom"></span></div>
+  <div class="r"><span class="k">a</span><span class="v" id="cTo"></span></div>
+  <hr><div class="r big"><span class="k">Monto de la transferencia</span><span class="v" id="cAmt"></span></div>
+  <hr><div class="r big"><span class="k">Recibirás</span><span class="v" id="cRec"></span></div>
+  <button class="ok" id="tfOk" type="button"><span class="tf-spin"></span><span id="tfOkTxt">Confirmar</span></button></div></div>
+
+<div class="tf-done" id="tfDone"><img src="assets/sim/img/v/transfer_success.png" alt=""><h2>Transferencia exitosa</h2><p id="tfDoneTxt"></p><button class="tf-ir" id="tfIr" type="button"><span class="tf-spin"></span><span>Ir a Portafolio</span></button></div>
+<script src="assets/sim/js/transfer.js?v=20261017zr"></script>
+</body>
+</html>

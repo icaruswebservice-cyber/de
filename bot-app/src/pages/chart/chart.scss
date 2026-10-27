@@ -1,0 +1,370 @@
+// ⚠️ NO agregar reglas .dc-drawer aquí NUNCA.
+//
+// Este archivo contenía una copia COMPLETA y desactualizada de la
+// regla .dc-drawer (idéntica a bot-app/src/components/shared_ui/drawer/drawer.scss,
+// pero con versiones antiguas de esos cambios). Al compilarse en el
+// bundle, esa copia duplicada podía ganar la cascada CSS sobre la
+// versión real y actualizada, anulando en silencio los ajustes hechos
+// ahí — específicamente en la página de Chart, que es donde vive
+// este archivo. Esto ha reaparecido más de una vez entre distintas
+// subidas del proyecto.
+//
+// La ÚNICA definición de .dc-drawer que debe existir en todo el
+// proyecto es la de drawer.scss — cualquier ajuste al drawer va ahí,
+// nunca aquí. Si en algún momento este archivo vuelve a tener una
+// regla .dc-drawer, es un error: hay que eliminarla, no corregirla.
+//
+// El archivo se mantiene vacío (en vez de borrarlo) porque
+// chart-wrapper.tsx todavía lo importa (`import './chart.scss'`).
+
+// Barra de botones encima de la gráfica (ChartMode + DrawTools, los únicos
+// que quedan renderizados — ver toolbar-widgets.tsx). La librería los coloca
+// por defecto en columna vertical (.sc-toolbar-widget{flex-direction:column}),
+// pegada al borde izquierdo. Se fuerza a fila horizontal con separación entre
+// los dos botones.
+// Todo lo de abajo hasta el bloque "SOLO COMPUTADOR" es el diseño de
+// celular/tablet (barra horizontal con 2 botones) — se limita a pantallas
+// menores a 1280px para que no afecte al computador. Su contenido no cambió.
+@media (max-width: 1279px) {
+    .dashboard__chart-wrapper {
+        .sc-toolbar-widget {
+            flex-direction: row !important;
+            // Más juntos que antes (traía 0.3rem).
+            gap: 0.1rem !important;
+            width: auto !important;
+            // Subida desde el borde inferior (donde vivía por defecto, a ~24-48px)
+            // hasta cerca de la mitad de la gráfica, sin llegar a estar centrada.
+            // calc() le resta 100px al 35% para bajarla sin perder el porcentaje
+            // (que la mantiene proporcional al alto de la gráfica).
+            bottom: calc(35% - 100px) !important;
+
+            &__items {
+                display: flex !important;
+                position: static !important;
+                width: auto !important;
+            }
+
+            // El layout en fila real vive en __items-inner (el hijo directo que
+            // la librería anima) — __items es solo un contenedor posicionador.
+            &__items-inner {
+                flex-direction: row !important;
+                gap: 0.1rem !important;
+
+                > * {
+                    margin: 0 !important;
+                }
+            }
+
+            // La librería oculta DrawTools en móvil (opacity:0 + deslizado hacia
+            // abajo) hasta que se "expande" el menú con el botón __more. Se
+            // fuerza a que quede SIEMPRE visible, sin necesidad de tocar nada.
+            &__items-inner .sc-chart-mode__menu,
+            &__items-inner .sc-dtools__menu {
+                opacity: 1 !important;
+                transform: translateY(0) !important;
+                pointer-events: auto !important;
+            }
+
+
+            // El botón "más" que expandía/colapsaba el menú ya no tiene función
+            // (los 2 únicos botones quedan siempre visibles) — se oculta.
+            &__more {
+                display: none !important;
+            }
+
+            // La etiqueta de intervalo (ej. "1t") se deja en minúscula y sin
+            // espacio, tal cual la pone la librería (texto correcto, ya
+            // confirmado). Lo que se corrige es SOLO su posición/estilo: por
+            // defecto la librería la pinta como una "cajita" separada (fondo gris
+            // oscuro #414652, esquinas redondeadas, desenfoque) flotando encima
+            // del círculo del ícono. Se le quita esa cajita y se centra el texto
+            // dentro del propio círculo, y se oculta el ícono original que
+            // quedaba detrás.
+            //
+            // OJO: este <span> NO vive dentro del botón de ChartMode — es
+            // hermano de __items a nivel de .sc-toolbar-widget (todo el
+            // contenedor, que ahora mide el ancho de los 2 botones juntos). Por
+            // eso "left:50%" lo centraba en el HUECO entre los dos botones, no
+            // sobre el primero.
+            //
+            // CORRECCIÓN: calcular un "left:Npx" fijo a mano (primero 17px,
+            // luego 20px) seguía quedando corrido a la izquierda — la
+            // librería anida el botón dentro de varias cajas (casilla de
+            // 40px, círculo adentro, ícono adentro de ese) y cualquier
+            // diferencia de unos pocos px en esa cadena desajusta un cálculo
+            // manual. En vez de seguir ajustando a ojo, ahora el texto ocupa
+            // TODO el ancho real del primer botón (40px, el de la casilla que
+            // arma la librería) desde left:0, y se centra con text-align —
+            // así queda centrado sin importar el tamaño exacto del círculo o
+            // el ícono que haya adentro.
+            &__interval {
+                top: 50% !important;
+                left: 0 !important;
+                width: 40px !important;
+                text-align: center !important;
+                transform: translateY(-50%) !important;
+                background: transparent !important;
+                backdrop-filter: none !important;
+                -webkit-backdrop-filter: none !important;
+                border-radius: 0 !important;
+                padding: 0 !important;
+                box-shadow: none !important;
+                z-index: 5 !important;
+                // Más pequeño que antes (traía 1.6rem) para que quepa bien
+                // centrado en el círculo ya reducido a 34px.
+                font-size: 1.2rem !important;
+                // Más delgado (la librería lo traía en negrita, font-weight:700).
+                font-weight: 400 !important;
+                // line-height:1 para que el propio glifo del texto quede
+                // centrado verticalmente dentro de su caja — sin esto, la
+                // caja de línea heredada de la librería (pensada para su
+                // "cajita" original) podía desplazar el texto unos px del
+                // centro real del botón.
+                line-height: 1 !important;
+            }
+
+            &__items-inner .sc-chart-mode__menu .ic-icon svg {
+                visibility: hidden !important;
+            }
+
+            // Había un SEGUNDO badge, aparte del anterior: la librería también
+            // pinta ".sc-chart-mode__menu__interval" directamente dentro del
+            // botón (arriba a la izquierda, con su propia cajita oscura). Ese es
+            // "el pequeño cuadro" que quedaba encima — no es el mismo elemento
+            // que ya se centró arriba, así que había que ocultarlo aparte.
+            &__items-inner .sc-chart-mode__menu__interval {
+                display: none !important;
+            }
+        }
+
+        // Ícono personalizado del botón "marcadores" (DrawTools) — ver
+        // toolbar-widgets.tsx. Se oculta el ícono original de la librería y se
+        // muestra encima el <svg> propio, centrado sobre el botón.
+        .dtools-custom-icon-wrap {
+            position: relative;
+            display: inline-flex;
+
+            .sc-dtools__menu .ic-icon svg {
+                visibility: hidden !important;
+            }
+        }
+
+        .dtools-custom-icon {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            // El ícono (compás de dibujo) tiene viewBox 24x30, no cuadrado —
+            // se mantiene esa proporción (4:5) en vez de forzarlo a 24x24, que
+            // lo dejaría deformado. Reducido en la misma proporción que el
+            // círculo (34/40) para que siga viéndose centrado y bien
+            // proporcionado dentro del botón más pequeño.
+            width: 16.3px;
+            height: 20.4px;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+        }
+
+        // Círculos un poco más pequeños que el tamaño de la librería (traían
+        // 40x40px). Selector calcado del que usa la propia librería para
+        // pintar el círculo de fondo de cada botón (ver smartcharts.css).
+        .sc-toolbar-widget .ciq-menu .cq-menu-btn .sc-chart-mode__menu,
+        .sc-toolbar-widget .ciq-menu .cq-menu-btn .sc-dtools__menu {
+            width: 34px !important;
+            height: 34px !important;
+        }
+    }
+
+    // El color del ícono sigue el tema activo, igual que el resto de íconos de
+    // la barra (.smartcharts-light / .smartcharts-dark viven en un ancestro,
+    // normalmente <body> o <html>, por eso van sin anidar bajo .dashboard__chart-wrapper).
+    .smartcharts-light .dtools-custom-icon path {
+        fill: rgba(0, 0, 0, 0.72);
+    }
+
+    .smartcharts-dark .dtools-custom-icon path {
+        fill: hsla(0, 0%, 100%, 0.72);
+    }
+
+    // La etiqueta "1t" traía color blanco fijo (pensado para su cajita gris
+    // oscura de fondo, que ya se quitó arriba) — ahora que va directo dentro
+    // del círculo, sigue el mismo color que el resto de íconos según el tema.
+    .smartcharts-light .sc-toolbar-widget__interval {
+        color: rgba(0, 0, 0, 0.72) !important;
+    }
+
+    .smartcharts-dark .sc-toolbar-widget__interval {
+        color: hsla(0, 0%, 100%, 0.72) !important;
+    }
+}
+
+// =====================================================================
+// SOLO COMPUTADOR (≥1280px): barra lateral de herramientas y controles de
+// zoom como en el Deriv Bot original.
+//  - Columna arriba a la izquierda, debajo del selector de mercado:
+//    Chart types (1T), Indicators, Templates, Drawing tools, Download.
+//  - Abajo a la izquierda, en columna: + (zoom in), cruz (crosshair),
+//    − (zoom out).
+// No aplica a la gráfica dentro del modal de Bot Builder (--modal), que
+// tiene su propio estilo en chart-modal.scss.
+// =====================================================================
+@media (min-width: 1280px) {
+    .dashboard__chart-wrapper:not(.dashboard__chart-wrapper--modal) {
+        .sc-toolbar-widget {
+            top: 10.4rem !important;
+            bottom: auto !important;
+            left: 1.4rem !important;
+            width: 4rem !important;
+            padding: 0.6rem !important;
+            gap: 0 !important;
+            border-radius: 4px;
+
+            .ciq-menu .cq-menu-btn {
+                .sc-chart-mode__menu,
+                .sc-studies__menu,
+                .sc-views__menu,
+                .sc-dtools__menu,
+                .sc-download__menu {
+                    width: 4rem !important;
+                    height: 4rem !important;
+                    border-radius: 4px !important;
+                    background: transparent !important;
+                    backdrop-filter: none !important;
+                    -webkit-backdrop-filter: none !important;
+                    position: relative;
+                }
+            }
+
+            // Etiqueta de intervalo ("1T") pequeña en la esquina superior
+            // del botón Chart types, sin la cajita gris de la librería.
+            .sc-chart-mode__menu__interval {
+                top: 0.2rem !important;
+                left: 0.6rem !important;
+                padding: 0 !important;
+                background: transparent !important;
+                font-size: 0.9rem !important;
+                line-height: 1 !important;
+                text-transform: uppercase !important;
+            }
+        }
+
+        .sc-navigation-widget {
+            left: 1.4rem !important;
+            bottom: 8rem !important;
+            transform: none !important;
+        }
+
+        .sc-navigation-widget__buttons {
+            // El DOM viene como [escala] [−] [cruz] [+]; en columna invertida
+            // queda + arriba, cruz al medio y − abajo, como el original.
+            flex-direction: column-reverse !important;
+            gap: 0.2rem !important;
+            padding: 0.2rem 0;
+            border-radius: 4px;
+        }
+
+        .sc-navigation-widget__item {
+            width: 3.2rem !important;
+            height: 3.2rem !important;
+            border-radius: 4px !important;
+            background: transparent !important;
+            backdrop-filter: none !important;
+            -webkit-backdrop-filter: none !important;
+
+            .ic-icon,
+            .ic-icon svg {
+                width: 1.6rem !important;
+                height: 1.6rem !important;
+            }
+        }
+
+        // "Scale to fit data" no está en el original.
+        .sc-scale-toggle {
+            display: none !important;
+        }
+    }
+}
+
+// Fondo del recuadro de ambas columnas según el tema (solo computador).
+@media (min-width: 1280px) {
+    .dashboard__chart-wrapper:not(.dashboard__chart-wrapper--modal) .smartcharts-dark {
+        .sc-toolbar-widget,
+        .sc-navigation-widget__buttons {
+            background: hsla(0, 0%, 100%, 0.04);
+        }
+
+        .sc-toolbar-widget .ciq-menu .cq-menu-btn:hover > div,
+        .sc-navigation-widget__item:hover {
+            background: hsla(0, 0%, 100%, 0.08) !important;
+        }
+
+        .sc-chart-mode__menu__interval {
+            color: hsla(0, 0%, 100%, 0.72) !important;
+        }
+    }
+
+    .dashboard__chart-wrapper:not(.dashboard__chart-wrapper--modal) .smartcharts-light {
+        .sc-toolbar-widget,
+        .sc-navigation-widget__buttons {
+            background: rgba(0, 0, 0, 0.04);
+        }
+
+        .sc-toolbar-widget .ciq-menu .cq-menu-btn:hover > div,
+        .sc-navigation-widget__item:hover {
+            background: rgba(0, 0, 0, 0.08) !important;
+        }
+
+        .sc-chart-mode__menu__interval {
+            color: rgba(0, 0, 0, 0.72) !important;
+        }
+    }
+}
+
+// =====================================================================
+// SOLO CELULAR/TABLET (<1280px): paneles "Chart types" y "Drawing tools".
+// La librería los pinta dentro de #modal_root, que es un contenedor flex
+// centrado; el envoltorio del gráfico ahí mide 0px de ancho, así que el
+// panel arrancaba en la MITAD de la pantalla y se salía por la derecha
+// (cortado, sin poder ver ni tocar todas las opciones). Aquí la capa del
+// panel ocupa toda la pantalla y el panel queda centrado, completo y con
+// scroll interno si no cabe. No afecta el menú de mercados (.cq-chart-title)
+// ni los demás modales de la app.
+// =====================================================================
+@media (max-width: 1279px) {
+    #modal_root .smartcharts-mobile > .cq-modal-dropdown.stxMenuActive:not(.cq-chart-title) {
+        position: fixed !important;
+        inset: 0 !important;
+        width: 100% !important;
+        height: 100% !important;
+
+        > .cq-modal__overlay {
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            width: 100% !important;
+            height: 100% !important;
+            padding: 1.6rem !important;
+            box-sizing: border-box !important;
+        }
+
+        .sc-dialog {
+            position: relative !important;
+            top: auto !important;
+            right: auto !important;
+            bottom: auto !important;
+            left: auto !important;
+            width: 100% !important;
+            max-width: 36rem !important;
+            max-height: 100% !important;
+            margin: 0 auto !important;
+            overflow-y: auto !important;
+            box-sizing: border-box !important;
+        }
+
+        // El título del panel ocupaba un ancho mínimo fijo de 240px que
+        // empujaba la "X" de cerrar; se deja flexible.
+        .sc-dialog__head--title {
+            min-width: 0 !important;
+            flex: 1 1 auto;
+        }
+    }
+}

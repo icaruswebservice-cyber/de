@@ -1,0 +1,13 @@
+{
+  "name": "tradelab-root",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Raíz del repo: delega todo a bot-app/ (por si Render se configura sin Root Directory).",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "build": "cd bot-app && npm install --include=dev && npm run build",
+    "start": "node bot-app/server.js"
+  }
+}

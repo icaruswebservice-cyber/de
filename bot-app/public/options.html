@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<base href="/">
+<link rel="icon" type="image/png" sizes="48x48" href="deriv-d-48.png">
+<link rel="icon" type="image/png" sizes="32x32" href="deriv-d-32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="deriv-d-16.png">
+<link rel="apple-touch-icon" href="deriv-d-180.png">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#ffffff">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Deriv Bot">
+<!-- Acelera la navegación hacia el bot-app (pestaña Chart): ver home.html. -->
+<link rel="preconnect" href="https://api.derivws.com" crossorigin>
+<link rel="dns-prefetch" href="https://api.derivws.com">
+<link rel="preconnect" href="https://auth.deriv.com">
+<link rel="dns-prefetch" href="https://auth.deriv.com">
+<link rel="prefetch" href="/">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Options | Deriv</title>
+<link rel="stylesheet" href="assets/sim/css/browser-frame.css?v=20261017zr">
+<link rel="stylesheet" href="assets/sim/css/deriv-desktop.css?v=20261017zr">
+<link rel="stylesheet" href="assets/sim/css/deriv-mobile.css?v=20261017zr" media="(max-width:860px)">
+<link rel="stylesheet" href="assets/sim/css/deriv-icons.css?v=20261017zr">
+</head>
+<body class="bf-static-page" data-page="options">
+<script src="assets/sim/js/sim-shared.js?v=20261017zr"></script>
+<script src="assets/sim/js/browser-frame.js?v=20261017zr"></script>
+<script>BrowserFrame.init();</script>
+<div class="dd-shell">
+  <div id="ddSidebar"></div>
+  <main class="dd-main">
+    <section class="dd-hero">
+      <div class="dd-hero-top"><div class="dd-toggle" id="acctToggle"><button class="active" data-acct="real">Real</button><button data-acct="demo">Demo</button></div><div class="dd-eye" id="eyeToggle" role="button" aria-label="Mostrar u ocultar saldo"><i class="ic ic-eye"></i></div></div>
+      <div class="dd-hero-skel"><div><i class="dd-skel"></i><b class="dd-skel"></b></div><div><i class="dd-skel"></i><b class="dd-skel"></b></div></div>
+      <div class="dd-hero-body">
+        <div class="header-text">
+          <div class="valor-total-label">Valor total de las operaciones</div>
+          <div class="valor-total-amount"><span class="balance-amount" data-hideable data-hero-amount>0.00</span><span class="balance-currency">USD</span><i class="ic ic-refresh"></i></div>
+          <div class="valor-total-updated" id="updatedTxt">Actualizado ahora</div>
+        </div>
+        <div class="dd-hero-actions"><div class="dd-action"><div class="circle primary"><i class="ic ic-h_operar"></i></div>Operar</div><div class="dd-action"><div class="circle ghost"><i class="ic ic-h_transfer"></i></div>Transferir</div></div>
+      </div>
+    </section>
+
+    <section class="dd-section mk-loading" id="mkSection">
+      <div class="mk-title-skel" aria-hidden="true"></div>
+      <div class="section-title" style="margin-bottom:1.0625rem">Mercados más negociados</div>
+      <div class="market-grid mk-skel-grid" id="marketSkel" aria-hidden="true"></div>
+      <div class="market-grid" id="marketGrid"></div>
+    </section>
+
+    <section class="dd-section">
+      <div class="section-title" style="margin-bottom:0.75rem">Presentado</div>
+      <div class="opt-feat">
+        <div class="opt-fc">
+          <div class="opt-media"><video class="opt-vid" poster="assets/sim/video/opt_rise.jpg" autoplay muted loop playsinline preload="auto" aria-hidden="true"><source src="assets/sim/video/opt_rise.mp4" type="video/mp4"><source src="assets/sim/video/opt_rise.webm" type="video/webm"></video></div>
+          <div class="opt-fb"><b>Subida/Caída</b><span>Prediga si el precio de mercado subirá o bajará al final de su contrato.</span></div>
+          <div class="opt-ff"><div class="opt-chips"><i>Más de 100 mercados</i><i>Desde 1 USD</i></div><button type="button" class="opt-go">Opere ahora</button></div>
+        </div>
+        <div class="opt-fc">
+          <div class="opt-media"><video class="opt-vid" poster="assets/sim/video/opt_gold.jpg" autoplay muted loop playsinline preload="auto" aria-hidden="true"><source src="assets/sim/video/opt_gold.mp4" type="video/mp4"><source src="assets/sim/video/opt_gold.webm" type="video/webm"></video></div>
+          <div class="opt-fb"><b>Comercio de oro</b><span class="clamp3">Prediga si los precios del oro subirán o bajarán. Opere con una de las materias primas más populares del mundo,...</span></div>
+          <div class="opt-ff"><div class="opt-chips"><i>Comercio 24 horas al día, 5 días a la semana</i><i>Desde 1 USD</i></div><button type="button" class="opt-go">Opere ahora</button></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="dd-section">
+      <div class="section-title" style="margin-bottom:0.75rem">Plataformas</div>
+      <div class="opt-plat">
+        <div class="opt-pc"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 72 72" role="img" ><path fill="#FF444F" d="M0 13.5C0 6.044 6.044 0 13.5 0h45C65.956 0 72 6.044 72 13.5v45C72 65.956 65.956 72 58.5 72h-45C6.044 72 0 65.956 0 58.5z"></path><path fill="#E12E3A" d="M13.5 0C6.044 0 0 6.044 0 13.5v.392L67.308 3.268A13.45 13.45 0 0 0 58.5 0zm55.197 4.652L56.35 72h2.15C65.956 72 72 65.956 72 58.5v-45c0-3.384-1.246-6.478-3.303-8.848"></path><path fill="#fff" d="M22.363 42.898q.347.032.788.063h1.102q3.686 0 5.45-1.858 1.795-1.859 1.795-5.135 0-3.433-1.7-5.197-1.702-1.764-5.387-1.764-.504 0-1.04.031-.536 0-1.008.063zm14.207-6.93q0 2.835-.882 4.946t-2.52 3.496q-1.607 1.386-3.938 2.08-2.331.692-5.229.692-1.322 0-3.087-.126a24 24 0 0 1-3.465-.44V25.352q1.701-.315 3.528-.41 1.86-.126 3.182-.126 2.804 0 5.071.63 2.3.63 3.938 1.985t2.52 3.465.882 5.071M54.552 25.07v4.189h-6.584v17.64h-4.914v-17.64h-6.583v-4.19z"></path></svg><div><b>Deriv Trader</b><span>Opere con opciones en más de 100 mercados. Sin tarifas de intercambio nocturno.</span></div></div>
+        <div class="opt-pc" id="derivBotCard" onclick="window.location.href='/#chart'"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 72 72" role="img" ><path fill="#FF444F" d="M0 13.5C0 6.044 6.044 0 13.5 0h45C65.956 0 72 6.044 72 13.5v45C72 65.956 65.956 72 58.5 72h-45C6.044 72 0 65.956 0 58.5z"></path><path fill="#E12E3A" d="M13.5 0C6.044 0 0 6.044 0 13.5v.392L67.308 3.268A13.45 13.45 0 0 0 58.5 0zm55.197 4.652L56.35 72h2.15C65.956 72 72 65.956 72 58.5v-45c0-3.384-1.246-6.478-3.303-8.848"></path><path fill="#fff" d="M21.63 42.86q.345.03.787.063h1.103q3.685 0 5.45-1.859 1.795-1.858 1.795-5.134 0-3.434-1.701-5.198t-5.387-1.764q-.503 0-1.04.032-.534 0-1.007.063zm14.206-6.93q0 2.835-.882 4.945t-2.52 3.497q-1.605 1.386-3.937 2.079-2.33.693-5.23.693-1.322 0-3.086-.126a24 24 0 0 1-3.465-.441V25.314q1.701-.314 3.528-.41 1.859-.125 3.181-.125 2.805 0 5.072.63 2.3.63 3.937 1.984t2.52 3.465.882 5.072m9.806 11.214q-1.796 0-3.59-.126a24 24 0 0 1-3.686-.504V25.346a29 29 0 0 1 3.307-.41 38 38 0 0 1 3.34-.157q2.078 0 3.81.315 1.765.284 3.025 1.008a5.2 5.2 0 0 1 1.953 1.921q.724 1.166.724 2.898 0 2.615-2.52 4.127 2.079.788 2.835 2.142t.756 3.055q0 3.434-2.52 5.166-2.489 1.733-7.434 1.733m-2.488-9.797v5.639q.535.063 1.165.094.63.032 1.386.032 2.205 0 3.56-.63t1.354-2.331q0-1.512-1.134-2.142-1.134-.662-3.244-.662zm0-3.748h2.394q2.268 0 3.244-.567.977-.6.977-1.89 0-1.323-1.008-1.859-1.009-.535-2.961-.535-.63 0-1.355.031-.724 0-1.291.063z"></path></svg><div><b>Deriv Bot</b><span>Cree y ejecute bots automatizados, sin necesidad de codificación.</span></div></div>
+        <div class="opt-pc"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 72 72" role="img" ><path fill="#384177" d="M0 13.5C0 6.044 6.044 0 13.5 0h45C65.956 0 72 6.044 72 13.5v45C72 65.956 65.956 72 58.5 72h-45C6.044 72 0 65.956 0 58.5z"></path><path fill="#2A3052" d="M13.5 0C6.044 0 0 6.044 0 13.5v.392L67.308 3.268A13.45 13.45 0 0 0 58.5 0zm55.197 4.652L56.35 72h2.15C65.956 72 72 65.956 72 58.5v-45c0-3.384-1.246-6.478-3.303-8.848"></path><path fill="#fff" d="M26.963 43.198q1.04 0 1.7-.158.694-.189 1.103-.472.41-.315.567-.725.158-.41.158-.913 0-1.071-1.008-1.764-1.008-.725-3.465-1.544a30 30 0 0 1-2.142-.85 8.6 8.6 0 0 1-1.922-1.229 6.1 6.1 0 0 1-1.386-1.795q-.535-1.071-.535-2.583t.567-2.71a5.8 5.8 0 0 1 1.606-2.078q1.04-.85 2.52-1.292 1.48-.472 3.34-.472 2.205 0 3.81.472 1.608.473 2.647 1.04l-1.418 3.874a12 12 0 0 0-2.047-.819q-1.103-.378-2.678-.378-1.764 0-2.551.504-.756.473-.756 1.48 0 .6.283 1.009.285.41.788.756.535.316 1.197.598.693.252 1.512.536 1.7.63 2.96 1.26 1.26.598 2.08 1.417a5.1 5.1 0 0 1 1.26 1.922q.41 1.102.41 2.677 0 3.056-2.143 4.757-2.142 1.67-6.457 1.67-1.45 0-2.615-.19a16 16 0 0 1-2.079-.41 13 13 0 0 1-1.543-.535q-.63-.283-1.071-.535l1.386-3.906q.976.535 2.394.976 1.449.41 3.528.41m26.381-18.081v4.19h-6.583v17.64h-4.914v-17.64h-6.584v-4.19z"></path></svg><div><b>SmartTrader</b><span>Interfaz clásica para operadores de opciones avanzadas.</span></div></div>
+      </div>
+    </section>
+
+    <section class="dd-section">
+      <div class="section-title" style="margin-bottom:0.75rem">Tipos de operación</div>
+      <div class="opt-pills">
+        <div class="pill active">Deriv Trader</div>
+        <div class="pill" id="derivBotPill" onclick="window.location.href='/#chart'">Deriv Bot</div>
+        <div class="pill">SmartTrader</div>
+      </div>
+      <div class="opt-tt">
+        <div class="opt-t"><img src="assets/sim/img/v/tt_rise.png" alt=""><span>Rise/Fall</span></div>
+        <div class="opt-t"><img src="assets/sim/img/v/tt_higher.png" alt=""><span>Higher/Lower</span></div>
+        <div class="opt-t"><img src="assets/sim/img/v/tt_matches.png" alt=""><span>Matches/Differs</span></div>
+        <div class="opt-t"><img src="assets/sim/img/v/tt_evenodd.png" alt=""><span>Even/Odd</span></div>
+        <div class="opt-t"><img src="assets/sim/img/v/tt_accum.png" alt=""><span>Accumulators</span></div>
+        <div class="opt-t"><img src="assets/sim/img/v/tt_overunder.png" alt=""><span>Over/Under</span></div>
+        <div class="opt-t"><img src="assets/sim/img/v/tt_multi.png" alt=""><span>Multipliers</span></div>
+        <div class="opt-t"><img src="assets/sim/img/v/tt_touch.png" alt=""><span>Touch/No Touch</span></div>
+        <div class="opt-t"><img src="assets/sim/img/v/tt_vanillas.png" alt=""><span>Vanillas</span></div>
+        <div class="opt-t"><img src="assets/sim/img/v/tt_turbos.png" alt=""><span>Turbos</span></div>
+      </div>
+    </section>
+
+  </main>
+</div>
+<div id="ddBottomNav"></div>
+<script src="assets/sim/js/deriv-shell.js?v=20261017zr"></script>
+<script>
+/* ================= WebSocket de mercados — gráficas en vivo ================= */
+const APP_ID = 1089;
+const WS_URL = `wss://ws.derivws.com/websockets/v3?app_id=${APP_ID}`;
+
+// Mismos 5 mercados que el panel original
+const MARKETS = [
+  { code:'R_75',    name:'Volatility 75 Index',      label:'75',  oneSec:false, ref:[37203.03, -0.03] },
+  { code:'1HZ10V',  name:'Volatility 10 (1s) Index', label:'10',  oneSec:true,  ref:[9292.13, 0.03] },
+  { code:'1HZ25V',  name:'Volatility 25 (1s) Index', label:'25',  oneSec:true,  ref:[879091.24, -0.01] },
+  { code:'R_100',   name:'Volatility 100 Index',     label:'100', oneSec:false, ref:[711.17, -0.21] },
+  { code:'1HZ75V',  name:'Volatility 75 (1s) Index', label:'75',  oneSec:true,  ref:[5174.84, 0.07] },
+];
+
+const MARKET_ICONS = {};
+function marketIcon(label, oneSec){
+  return `<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 32 32" width="32" height="32" role="img" class="market-icon"><path fill="#0AA0B0" d="M22.5 13H24v9h-1.5v10h-1V22H20v-9h1.5v-2h1zm7.5-2v7h-1.5v4h-1v-4H26v-7zm-13.5 9v-4h-1v4H14v8h1.5v2h1v-2H18v-8zm-6-5H12v6h-1.5v7h-1v-7H8v-6h1.5v-2h1zm-6 4H6v4H4.5v2h-1v-2H2v-4h1.5v-2h1z"/><rect width="14" height="10" rx="2" fill="#414652"/><text x="7" y="7.4" text-anchor="middle" font-family="Inter,Arial,sans-serif" font-weight="700" font-size="${label.length>2?5.6:6.8}" fill="#fff">${label}</text>${oneSec ? '<circle cx="27" cy="5" r="5" fill="#FF444F"/><text x="27" y="6.9" text-anchor="middle" font-family="Inter,Arial,sans-serif" font-weight="700" font-size="4.6" fill="#fff">1s</text>' : ''}</svg>`;
+}
+MARKETS.forEach(m => { MARKET_ICONS[m.code] = marketIcon(m.label, m.oneSec); });
+
+const history = {}; // code -> [{epoch, price}]
+let ws;
+
+function buildGrid(){
+  const grid = document.getElementById('marketGrid');
+
+  grid.innerHTML = MARKETS.map(m => `
+    <button type="button" class="market-card" data-testid="options-btn-top-market-${m.code}">
+      <div class="market-icon-row">
+        ${MARKET_ICONS[m.code]}
+      </div>
+
+      <div class="market-info">
+        <div class="market-name">${m.name}</div>
+        <div class="market-price" id="price-${m.code}">…</div>
+      </div>
+
+      <div class="market-bottom" data-testid="options-text-top-market-change-${m.code}">
+        <svg class="sparkline" id="spark-${m.code}" viewBox="0 0 64 32" preserveAspectRatio="none" aria-hidden="true"></svg>
+        <div class="market-change" id="change-${m.code}">—</div>
+      </div>
+    </button>
+  `).join('') + `
+    <button type="button" class="market-card viewall-card" data-testid="options-btn-top-markets-view-all">
+      <div class="viewall-icon">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" aria-hidden="true">
+          <path d="m24.555 16.969-6.875 6.875a.66.66 0 0 1-.899 0 .66.66 0 0 1 0-.899l5.82-5.82H7.876a.617.617 0 0 1-.625-.625c0-.312.273-.625.625-.625h14.727l-5.82-5.781a.66.66 0 0 1 0-.899.66.66 0 0 1 .898 0l6.875 6.875a.66.66 0 0 1 0 .899"></path>
+        </svg>
+      </div>
+      <span>Ver todo</span>
+    </button>
+  `;
+}
+
+function connect(){
+  ws = new WebSocket(WS_URL);
+  ws.onopen = () => {
+    setConn(true);
+    MARKETS.forEach(m => {
+      ws.send(JSON.stringify({
+        ticks_history: m.code,
+        adjust_start_time: 1,
+        count: 200,
+        end: 'latest',
+        start: 1,
+        style: 'ticks',
+        subscribe: 1,
+        req_id: Date.now() % 100000
+      }));
+    });
+  };
+  ws.onclose = () => { setConn(false); setTimeout(connect, 3000); };
+  ws.onerror = () => setConn(false);
+  ws.onmessage = (msg) => handle(JSON.parse(msg.data));
+}
+
+function setConn(live){
+  // connDot/connText no existen en esta página: sin esta comprobación
+  // setConn() lanzaba un error en onopen y nunca se pedían los precios.
+  const dot = document.getElementById('connDot');
+  const txt = document.getElementById('connText');
+  if (dot) dot.classList.toggle('live', live);
+  if (txt) txt.textContent = live ? 'Live' : 'Reconectando';
+  document.getElementById('updatedTxt').textContent = live ? 'Actualizado en vivo' : 'Conectando…';
+}
+
+function handle(data){
+  if (data.error) { console.warn(data.error.message); return; }
+
+  if (data.msg_type === 'history'){
+    const code = data.echo_req.ticks_history;
+    const times = data.history.times;
+    const prices = data.history.prices;
+    history[code] = times.map((t,i)=>({ epoch:t, price: parseFloat(prices[i]) }));
+    render(code);
+  }
+
+  if (data.msg_type === 'tick'){
+    const t = data.tick;
+    const code = t.symbol;
+    if (!history[code]) history[code] = [];
+    history[code].push({ epoch: t.epoch, price: parseFloat(t.quote) });
+    if (history[code].length > 300) history[code].shift();
+    render(code);
+  }
+}
+
+function render(code){
+  const arr = history[code];
+  if (!arr || !arr.length) return;
+  const last = arr[arr.length-1].price;
+  const first = arr[0].price;
+  const change = ((last - first) / first) * 100;
+
+  const priceEl = document.getElementById(`price-${code}`);
+  const changeEl = document.getElementById(`change-${code}`);
+  if (priceEl) priceEl.textContent = last.toLocaleString('en-US', { minimumFractionDigits:2, maximumFractionDigits:2 });
+  if (changeEl){
+    changeEl.className = 'market-change ' + (change >= 0 ? 'up' : 'down');
+    changeEl.innerHTML = `${change>=0?'+':''}${change.toFixed(2)}% <span class="tf">(5m)</span>`;
+  }
+  drawSparkline(code, arr.slice(-140), change >= 0);
+}
+
+function drawSparkline(code, points, up){
+  const svg = document.getElementById(`spark-${code}`);
+  if (!svg || points.length < 2) return;
+  const animate = window.__mkReveal && !svg.dataset.anim;
+  if (animate) svg.dataset.anim = '1';
+  const w = 64, h = 28;
+  const prices = points.map(p=>p.price);
+  const max = Math.max(...prices), min = Math.min(...prices);
+  const range = (max - min) || 1;
+  const step = w / (points.length - 1);
+  const coords = points.map((p,i) => {
+    const x = i * step;
+    const y = h - ((p.price - min) / range) * h;
+    return `${x.toFixed(2)},${y.toFixed(2)}`;
+  }).join(' ');
+  const color = up ? '#00c896' : '#de0040';
+  svg.innerHTML = `<polyline${animate ? ' class="mk-draw" pathLength="1"' : ''} points="${coords}" fill="none" stroke="${color}" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>`;
+}
+
+
+buildGrid();
+
+/* ---- Animación de carga (medida fotograma a fotograma del video): esqueleto ~0.9 s y luego las
+   tarjetas aparecen con las gráficas dibujándose de izquierda a derecha (~0.6 s). Se repite cada vez que se entra. ---- */
+function seedFallback(m){
+  // Si aún no llegó el historial en vivo, se usa el valor de referencia con una serie de muestra.
+  if (history[m.code] && history[m.code].length) return;
+  let seed = 0; for (const ch of m.code) seed = (seed * 31 + ch.charCodeAt(0)) % 9973;
+  const rnd = () => (seed = (seed * 9301 + 49297) % 233280) / 233280;
+  const base = m.ref[0], pct = m.ref[1] / 100, n = 140, arr = [];
+  let p = base / (1 + pct), walk = 0;
+  for (let i = 0; i < n; i++){
+    const target = base / (1 + pct) + (base - base / (1 + pct)) * (i / (n - 1));
+    walk += (rnd() - 0.5) * base * 0.0022; walk *= 0.82;   // ruido correlacionado: picos finos y juntos
+    p = target + walk;
+    arr.push({ epoch: i, price: i === n - 1 ? base : i === 0 ? base / (1 + pct) : p });
+  }
+  history[m.code] = arr; render(m.code);
+}
+function buildSkeleton(){
+  document.getElementById('marketSkel').innerHTML = Array.from({length:8}, () =>
+    '<div class="market-card mk-skel"><i class="sk c"></i><i class="sk b1"></i><i class="sk b2"></i><i class="sk b3"></i><i class="sk b4"></i></div>').join('');
+}
+let mkTimer;
+function playMarketsIntro(){
+  const sec = document.getElementById('mkSection');
+  clearTimeout(mkTimer);
+  window.__mkReveal = false;
+  MARKETS.forEach(m => { const s = document.getElementById(`spark-${m.code}`); if (s) delete s.dataset.anim; });
+  sec.classList.add('mk-loading');
+  mkTimer = setTimeout(() => {
+    MARKETS.forEach(seedFallback);
+    sec.classList.remove('mk-loading');
+    window.__mkReveal = true;
+    MARKETS.forEach(m => render(m.code));
+  }, 900);
+}
+buildSkeleton();
+playMarketsIntro();
+window.addEventListener('pageshow', e => { if (e.persisted) playMarketsIntro(); });
+connect();
+</script>
+</body>
+</html>

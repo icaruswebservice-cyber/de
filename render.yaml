@@ -1,0 +1,50 @@
+# Blueprint de Render (opcional). Si prefieres crear todo a mano, sigue
+# bot-app/DEPLOY.md: el resultado es el mismo.
+#
+# Crea 2 cosas:
+#   1. tradelab-db  → base de datos PostgreSQL (aparte), donde se guardan
+#                     las cuentas y los códigos de 6 dígitos.
+#   2. tradelab-bot → Web Service de Node (bot-app protegido con login).
+
+databases:
+  - name: tradelab-db
+    databaseName: tradelab
+    user: tradelab
+    plan: free
+
+services:
+  - type: web
+    name: tradelab-bot
+    runtime: node
+    plan: free
+    rootDir: bot-app
+    # --include=dev: con NODE_ENV=production npm omite las devDependencies
+    # (rsbuild es devDependency; sin esto la build falla con "rsbuild: not found").
+    buildCommand: npm install --include=dev && npm run build
+    startCommand: node server.js
+    envVars:
+      - key: NODE_VERSION
+        value: 22
+      - key: NODE_ENV
+        value: production
+      # Conexión a la base de datos (URL interna, la pone Render solo).
+      - key: DATABASE_URL
+        fromDatabase:
+          name: tradelab-db
+          property: connectionString
+      # Contraseña del panel /admin (Render te la pide al crear el Blueprint).
+      - key: ADMIN_PASSWORD
+        sync: false
+      # Clave para firmar las sesiones. Render la genera una vez y la conserva.
+      - key: SESSION_SECRET
+        generateValue: true
+      - key: NEXT_PUBLIC_DERIV_APP_ID
+        sync: false
+      - key: NEXT_PUBLIC_DERIV_APP_NAME
+        value: Dreiv Vot
+      - key: NEXT_PUBLIC_DERIV_ENV
+        value: production
+      - key: NEXT_PUBLIC_DERIV_REFERRAL_LINK
+        sync: false
+      - key: NEXT_PUBLIC_DERIV_OAUTH_SCOPES
+        value: trade

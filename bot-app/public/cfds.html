@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<base href="/">
+<link rel="icon" type="image/png" sizes="48x48" href="deriv-d-48.png">
+<link rel="icon" type="image/png" sizes="32x32" href="deriv-d-32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="deriv-d-16.png">
+<link rel="apple-touch-icon" href="deriv-d-180.png">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#ffffff">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Deriv Bot">
+<!-- Acelera la navegación hacia el bot-app (pestaña Chart): ver home.html. -->
+<link rel="preconnect" href="https://api.derivws.com" crossorigin>
+<link rel="dns-prefetch" href="https://api.derivws.com">
+<link rel="preconnect" href="https://auth.deriv.com">
+<link rel="dns-prefetch" href="https://auth.deriv.com">
+<link rel="prefetch" href="/">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>CFDs | Deriv</title>
+<link rel="stylesheet" href="assets/sim/css/browser-frame.css?v=20261017zr">
+<link rel="stylesheet" href="assets/sim/css/deriv-desktop.css?v=20261017zr">
+<link rel="stylesheet" href="assets/sim/css/deriv-mobile.css?v=20261017zr" media="(max-width:860px)">
+<link rel="stylesheet" href="assets/sim/css/deriv-icons.css?v=20261017zr">
+</head>
+<body class="bf-static-page" data-page="cfds">
+<script src="assets/sim/js/sim-shared.js?v=20261017zr"></script>
+<script src="assets/sim/js/browser-frame.js?v=20261017zr"></script>
+<script>BrowserFrame.init();</script>
+<div class="dd-shell">
+  <div id="ddSidebar"></div>
+  <main class="dd-main">
+    <section class="dd-hero">
+      <div class="dd-hero-top"><div class="dd-toggle" id="acctToggle"><button class="active" data-acct="real">Real</button><button data-acct="demo">Demo</button></div><div class="dd-eye" id="eyeToggle" role="button" aria-label="Mostrar u ocultar saldo"><i class="ic ic-eye"></i></div></div>
+      <div class="dd-hero-skel"><div><i class="dd-skel"></i><b class="dd-skel"></b></div><div><i class="dd-skel"></i><b class="dd-skel"></b></div></div>
+      <div class="dd-hero-body">
+        <div class="header-text">
+          <div class="valor-total-label">Valor total de las operaciones</div>
+          <div class="valor-total-amount"><span class="balance-amount" data-hideable data-hero-amount>0.00</span><span class="balance-currency">USD</span><i class="ic ic-refresh"></i></div>
+          <div class="valor-total-updated" id="updatedTxt">Actualizado ahora</div>
+        </div>
+        <div class="dd-hero-actions"><div class="dd-action"><div class="circle primary"><i class="ic ic-h_plus"></i></div>Depósito</div><div class="dd-action"><div class="circle ghost"><i class="ic ic-h_chart"></i></div>Comercio</div></div>
+      </div>
+    </section>
+
+    <section class="dd-section">
+      <div class="dd-section-head"><div class="section-title">mis cuentas</div></div>
+      <div class="accounts-scroll">
+        <div class="account-card" style="flex:0 0 12.5rem"><div class="account-icon"><img src="assets/sim/img/TradingView.webp" alt=""></div><div class="account-name">TradingView</div><div class="account-balance"><span class="balance-amount" data-hideable>0.00</span><span class="balance-currency">USD</span></div></div>
+        <div class="account-card" style="flex:0 0 12.5rem"><div class="account-icon"><img src="assets/sim/img/MT5.webp" alt=""></div><div class="account-name">CFDs | Standard</div><div class="account-balance"><span class="balance-amount" data-hideable>0.00</span><span class="balance-currency">USD</span></div></div>
+      </div>
+    </section>
+
+    <section class="dd-section">
+      <div class="section-title" style="margin-bottom:1.125rem">Destacado</div>
+      <div class="cfd-featured">
+        <div class="img"><video class="cfd-gold-vid" poster="assets/sim/video/cfd_gold.jpg" autoplay muted loop playsinline preload="auto" aria-label="Gold"><source src="assets/sim/video/cfd_gold.mp4" type="video/mp4"><source src="assets/sim/video/cfd_gold.webm" type="video/webm"></video></div>
+        <div class="txt"><b>Gold</b><span>Cuenta especializada en oro y metales.</span></div>
+        <div class="foot"><span class="mini"><img src="assets/sim/img/v/cfd_gold_icon.png" alt="">Gold</span><button class="dd-pill-btn">Activar ahora</button></div>
+      </div>
+    </section>
+
+    <section class="dd-section">
+      <div class="dd-avail-head"><div class="section-title">Cuentas disponibles</div><button class="dd-pill-btn">Comparar</button></div>
+      <div class="cfd-avail-grid">
+        <div class="cfd-avail"><img src="assets/sim/img/MT5.webp" alt=""><b>Standard</b><span>Spreads competitivos y apalancamiento flexible en los principales mercados.</span></div>
+        <div class="cfd-avail"><img src="assets/sim/img/SWF.webp" alt=""><b>Swap-Free</b><span>Opera sin comisiones por mantener posiciones abiertas de un día para otro.</span></div>
+        <div class="cfd-avail"><img src="assets/sim/img/MT5.webp" alt=""><b>Spread cero</b><span>Spreads desde 0 pips con comisión fija por operación.</span></div>
+      </div>
+    </section>
+
+  </main>
+</div>
+<div id="ddBottomNav"></div>
+<script src="assets/sim/js/deriv-shell.js?v=20261017zr"></script>
+
+</body>
+</html>

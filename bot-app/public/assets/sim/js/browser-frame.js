@@ -1,0 +1,638 @@
+/* ================================================================
+ * browser-frame.js — marco visual tipo navegador (Chrome / Safari)
+ * ----------------------------------------------------------------
+ * Decorativo únicamente. No toca el navegador real ni sus APIs de
+ * seguridad. La "dirección" que se muestra es SIEMPRE
+ * window.location.hostname — la dirección real donde está corriendo
+ * la app, nunca un dominio inventado.
+ *
+ * Comportamiento:
+ * - Chrome  -> solo barra SUPERIOR. El resto de la app (header,
+ *   contenido, navegación) se desplaza hacia abajo automáticamente.
+ * - Safari  -> solo barra INFERIOR. El contenido y la navegación
+ *   propia de la app se acomodan encima de ella automáticamente.
+ * El marco NUNCA se superpone: reserva su espacio real (medido con
+ * getBoundingClientRect, no un valor fijo) mediante las variables
+ * CSS --browser-frame-top-height / --browser-frame-bottom-height,
+ * que el resto del CSS (ver browser-frame.css) usa para su padding.
+ *
+ * Uso: incluir este script (y browser-frame.css) en cualquier
+ * página y llamar BrowserFrame.init() al final del <body>.
+ * ================================================================ */
+(function (window) {
+  'use strict';
+
+  var STORAGE_KEY = 'browserAppearance';
+  var DEFAULT_MODE = 'none';
+  var root = document.documentElement;
+
+  function getRealAddress() {
+    try {
+      var host = window.location.hostname;
+      return host && host !== '' ? host : 'localhost';
+    } catch (err) {
+      return 'localhost';
+    }
+  }
+
+  // Texto de la barra simulada — NO depende de window.location. Es un
+  // valor propio de la app, editable por el usuario, guardado en su
+  // propia clave de localStorage. Nunca toca la URL real del navegador.
+  var SIM_TEXT_KEY = 'simulatedNavigationText';
+  var DEFAULT_SIM_TEXT = 'bot.deriv.com';
+
+  function getSimulatedText() {
+    try {
+      var v = localStorage.getItem(SIM_TEXT_KEY);
+      return v && v.trim() !== '' ? v : DEFAULT_SIM_TEXT;
+    } catch (err) {
+      return DEFAULT_SIM_TEXT;
+    }
+  }
+
+  function setSimulatedText(value) {
+    var clean = (value || '').trim();
+    if (clean === '') clean = DEFAULT_SIM_TEXT;
+    try {
+      localStorage.setItem(SIM_TEXT_KEY, clean);
+    } catch (err) {
+      /* localStorage no disponible — el valor solo dura la sesión actual */
+    }
+    return clean;
+  }
+
+  // Ruta simulada dinámica ("/#chart", "/#bot_builder", "/#dashboard", ...)
+  // — se LEE de location.hash (la misma navegación hash/SPA que ya usa
+  // la app real, ver main.tsx), nunca se escribe ni se modifica.
+  function getSimulatedRoute() {
+    try {
+      var h = window.location.hash; // incluye el "#", ej. "#chart"
+      return h && h.length > 1 ? '/' + h : '';
+    } catch (err) {
+      return '';
+    }
+  }
+
+  // Detecta si la página actual es home.html, leyendo únicamente
+  // location.pathname (solo lectura, no se modifica nada).
+  function isHomePage() {
+    try {
+      return /(^|\/)home\.html$/.test(window.location.pathname);
+    } catch (err) {
+      return false;
+    }
+  }
+
+  // Prefijo NO editable ("home " o "") — se muestra aparte de
+  // .bf-host para que editar el texto nunca borre ni guarde este
+  // prefijo como si fuera parte del DEFAULT_SIM_TEXT del usuario.
+  function getSimulatedPrefix() {
+    return isHomePage() ? 'home ' : '';
+  }
+
+  function getMode() {
+    try {
+      var v = localStorage.getItem(STORAGE_KEY);
+      return v === 'chrome' || v === 'safari' || v === 'none' ? v : DEFAULT_MODE;
+    } catch (err) {
+      return DEFAULT_MODE;
+    }
+  }
+
+  function setMode(mode) {
+    try {
+      localStorage.setItem(STORAGE_KEY, mode);
+    } catch (err) {
+      /* localStorage no disponible — el aspecto no persiste, pero no rompe nada */
+    }
+  }
+
+  function svgIcon(name) {
+    var icons = {
+      menu: '<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="18" x2="20" y2="18"/></svg>',
+      back: '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 6l-6 6 6 6"/></svg>',
+      fwd: '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg>',
+      share: '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v12M7 8l5-5 5 5M5 21h14"/></svg>',
+      book: '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h11a3 3 0 0 1 3 3v13H7a3 3 0 0 0-3 3z"/></svg>',
+      tabs: '<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="16" height="16" rx="4"/></svg>',
+      reload: '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 1 1-3-6.7M21 4v5h-5"/></svg>',
+      lock: '<svg viewBox="0 0 24 24" width="12" height="12" fill="currentColor"><path d="M12 2a4 4 0 0 0-4 4v3H7a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-9a2 2 0 0 0-2-2h-1V6a4 4 0 0 0-4-4m0 2a2 2 0 0 1 2 2v3H10V6a2 2 0 0 1 2-2"/></svg>',
+      aspect: '<svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 1 0 18z" fill="currentColor" stroke="none"/></svg>',
+      controls: '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 512 512" fill="#ffffff"><path d="M32 64C14.3 64 0 78.3 0 96s14.3 32 32 32l86.7 0c12.3 28.3 40.5 48 73.3 48s61-19.7 73.3-48L480 128c17.7 0 32-14.3 32-32s-14.3-32-32-32L265.3 64C253 35.7 224.8 16 192 16s-61 19.7-73.3 48L32 64zm0 160c-17.7 0-32 14.3-32 32s14.3 32 32 32l246.7 0c12.3 28.3 40.5 48 73.3 48s61-19.7 73.3-48l54.7 0c17.7 0 32-14.3 32-32s-14.3-32-32-32l-54.7 0c-12.3-28.3-40.5-48-73.3-48s-61 19.7-73.3 48L32 224zm0 160c-17.7 0-32 14.3-32 32s14.3 32 32 32l54.7 0c12.3 28.3 40.5 48 73.3 48s61-19.7 73.3-48L480 448c17.7 0 32-14.3 32-32s-14.3-32-32-32l-246.7 0c-12.3-28.3-40.5-48-73.3-48s-61 19.7-73.3 48L32 384z"/></svg>',
+      home: '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="24"><path d="M3.5 20V10.5L12 3.5l8.5 7V20M3.5 20H9M15 20h5.5M9 20v-6h6v6" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round"/></svg>',
+      plus: '<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>',
+      dots: '<svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><circle cx="12" cy="5" r="2.2"/><circle cx="12" cy="12" r="2.2"/><circle cx="12" cy="19" r="2.2"/></svg>',
+    };
+    return icons[name] || '';
+  }
+
+  // Cuadrito con número — imita el botón "cantidad de pestañas" de Chrome
+  // (un cuadrado redondeado con el número dentro, en vez de un ícono).
+  // Puramente decorativo, el número es fijo (no cuenta pestañas reales).
+  function tabsCountHtml(n) {
+    return '<span class="bf-tabs-count">' + n + '</span>';
+  }
+
+  var aspectBtnHtml =
+    '<button class="bf-icon-btn bf-aspect-btn" aria-label="Aspecto" title="Aspecto" onclick="BrowserFrame.openSelector()">' +
+    svgIcon('home') +
+    '</button>';
+
+  function buildTopBar() {
+    var prefix = getSimulatedPrefix();
+    var host = getSimulatedText();
+    var route = getSimulatedRoute();
+    var top = document.createElement('div');
+    top.className = 'bf-top';
+    top.innerHTML =
+      aspectBtnHtml +
+      '<div class="bf-address"><span class="bf-lock">' + svgIcon('controls') + '</span>' +
+      '<span class="bf-prefix">' + prefix + '</span>' +
+      '<span class="bf-host" contenteditable="true" spellcheck="false">' + host + '</span>' +
+      '<span class="bf-route">' + route + '</span></div>' +
+      '<button class="bf-icon-btn" aria-label="Nueva pestaña">' + svgIcon('plus') + '</button>' +
+      '<button class="bf-icon-btn" aria-label="Pestañas">' + tabsCountHtml(2) + '</button>' +
+      '<button class="bf-icon-btn" aria-label="Menú">' + svgIcon('dots') + '</button>';
+    return top;
+  }
+
+  function buildBottomBar() {
+    var prefix = getSimulatedPrefix();
+    var host = getSimulatedText();
+    var route = getSimulatedRoute();
+    var bottom = document.createElement('div');
+    bottom.className = 'bf-bottom';
+    bottom.innerHTML =
+      '<div class="bf-safari-addr-row">' +
+      aspectBtnHtml +
+      '<div class="bf-address"><span class="bf-lock">' + svgIcon('lock') + '</span>' +
+      '<span class="bf-prefix">' + prefix + '</span>' +
+      '<span class="bf-host" contenteditable="true" spellcheck="false">' + host + '</span>' +
+      '<span class="bf-route">' + route + '</span>' +
+      '<span class="bf-icon-btn" style="width:14px;height:14px;opacity:.6;margin-left:6px">' + svgIcon('reload') + '</span></div>' +
+      '<span style="width:28px;flex:0 0 auto"></span>' +
+      '</div>' +
+      '<div class="bf-safari-controls-row">' +
+      '<button class="bf-icon-btn" aria-label="Atrás">' + svgIcon('back') + '</button>' +
+      '<button class="bf-icon-btn" aria-label="Adelante">' + svgIcon('fwd') + '</button>' +
+      '<button class="bf-icon-btn" aria-label="Compartir">' + svgIcon('share') + '</button>' +
+      '<button class="bf-icon-btn" aria-label="Marcadores">' + svgIcon('book') + '</button>' +
+      '<button class="bf-icon-btn" aria-label="Pestañas">' + svgIcon('tabs') + '</button>' +
+      '</div>';
+    return bottom;
+  }
+
+  // Solo el menú de las páginas estáticas (home.html/options.html) se
+  // mueve realmente en el DOM — ahí lo controlo por completo y es
+  // seguro. El menú de la app React (.mobile-bottom-nav / .app-footer)
+  // NO se mueve: esa app calcula alturas internas (el panel de Run,
+  // el dashboard) asumiendo que su menú es position:fixed y no ocupa
+  // espacio de flujo: moverlo rompía esos cálculos (Run/Reset se
+  // cortaban). Para esos casos se usa un desplazamiento calculado en
+  // su lugar, sin tocar el DOM.
+  var REAL_MOVE_SELECTOR = '.bottom-nav';
+  var OFFSET_ONLY_SELECTORS = ['.mobile-bottom-nav', '.app-footer'];
+  var STACK_ID = 'bfSafariStack';
+
+  function findOffsetOnlyNav() {
+    for (var i = 0; i < OFFSET_ONLY_SELECTORS.length; i++) {
+      var el = document.querySelector(OFFSET_ONLY_SELECTORS[i]);
+      if (el) return el;
+    }
+    return null;
+  }
+
+  /** Caso "página estática": saca el menú de su position:fixed y lo
+   * mueve, en el DOM real, al mismo contenedor apilado (flex-column)
+   * que la barra Safari — en ese orden: menú primero, Safari después.
+   * Caso "app React": el menú se queda donde está (fixed); solo se le
+   * calcula un `bottom` para que la barra Safari (también fixed,
+   * independiente) quede justo debajo sin superponerse. */
+  function placeSafariBar(safariBar) {
+    var realMoveNav = document.querySelector(REAL_MOVE_SELECTOR);
+
+    if (realMoveNav) {
+      var stack = document.createElement('div');
+      stack.id = STACK_ID;
+      stack.className = 'bf-safari-stack';
+      realMoveNav.classList.add('bf-nav-in-stack');
+      stack.appendChild(realMoveNav); // lo saca de donde estaba y lo mete aquí, EN ESE ORDEN
+      stack.appendChild(safariBar); // Safari va DESPUÉS del menú, nunca antes
+      document.body.appendChild(stack);
+      return;
+    }
+
+    // App React: no mover nada del DOM existente, solo agregar la
+    // barra Safari como su propio elemento fixed independiente.
+    var offsetNav = findOffsetOnlyNav();
+    if (offsetNav) offsetNav.classList.add('bf-nav-offset');
+    document.body.appendChild(safariBar);
+  }
+
+  /** Deshace lo anterior (modo Chrome, donde no hace falta coordinar
+   * nada con una barra inferior porque no existe). */
+  function unstackNav() {
+    var stackedNav = document.querySelector('.bf-nav-in-stack');
+    if (stackedNav) {
+      stackedNav.classList.remove('bf-nav-in-stack');
+      document.body.appendChild(stackedNav);
+    }
+    var stack = document.getElementById(STACK_ID);
+    if (stack) stack.remove();
+
+    var offsetNav = document.querySelector('.bf-nav-offset');
+    if (offsetNav) offsetNav.classList.remove('bf-nav-offset');
+  }
+
+  /** Mide el frame real (no un valor fijo) y actualiza las variables CSS
+   * que el resto de la app usa para reservar su espacio. */
+  function measureAndSetVars() {
+    var top = document.querySelector('.bf-top');
+    var stack = document.getElementById(STACK_ID);
+    var bar = document.querySelector('.bf-bottom');
+    var topH = top ? top.getBoundingClientRect().height : 0;
+    // Caso página estática: el bloque apilado completo (menú + barra).
+    // Caso app React: la barra Safari sola (el menú no se movió, se le
+    // aplica su propio offset — ver CSS .bf-nav-offset).
+    var bottomH = stack ? stack.getBoundingClientRect().height : bar ? bar.getBoundingClientRect().height : 0;
+    root.style.setProperty('--browser-frame-top-height', topH + 'px');
+    root.style.setProperty('--browser-frame-bottom-height', bottomH + 'px');
+
+    // Altura real del header propio de la app (donde está el saldo,
+    // .app-header en la app React / .header-top en home.html), para
+    // que ningún panel/contenido pueda crecer por encima de él, sin
+    // importar el modo de aspecto seleccionado ni la pestaña activa.
+    var MIN_HEADER_HEIGHT = 72; // px — mínimo garantizado.
+    var appHeader = document.querySelector('.app-header') || document.querySelector('.header-top');
+    var measuredHeaderH = appHeader ? appHeader.getBoundingClientRect().height : 0;
+    // Si no se encuentra o mide menos que el mínimo (p.ej. en una
+    // pestaña donde el selector no aplica), usar el mínimo — sin
+    // esto, el tope efectivo sería "toda la pantalla".
+    var appHeaderH = measuredHeaderH > MIN_HEADER_HEIGHT ? measuredHeaderH : MIN_HEADER_HEIGHT;
+    root.style.setProperty('--app-header-height', appHeaderH + 'px');
+
+    // LÍMITE EXACTO: borde inferior REAL del header del saldo, medido
+    // desde el borde superior de la pantalla. Ya incluye la barra
+    // Chrome (si está activa) y el notch, porque es la posición real
+    // donde termina el header en pantalla. Ningún panel (Transactions /
+    // Summary / Journal, capa de Run) puede subir más allá de esta
+    // línea: así el header del saldo SIEMPRE queda visible, debajo de
+    // la barra del navegador y encima de todo lo demás.
+    var headerBottom = 0;
+    if (appHeader && measuredHeaderH > 0) {
+      headerBottom = appHeader.getBoundingClientRect().bottom;
+    }
+    // Sin header (todavía montándose) → respaldo: barra + alto mínimo.
+    var minBottom = topH + (appHeader && measuredHeaderH > 0 ? measuredHeaderH : MIN_HEADER_HEIGHT);
+    if (headerBottom < minBottom) headerBottom = minBottom;
+    root.style.setProperty('--app-header-bottom', Math.round(headerBottom) + 'px');
+
+    // Altura real del drawer (.dc-drawer, ver drawer.scss) — cambia
+    // entre cerrado (solo la flecha, 3.6rem) y abierto (crece hacia
+    // abajo). El área del gráfico/Volatility usa esto para reservar
+    // exactamente ese espacio y quedar SIEMPRE debajo del drawer, sin
+    // que este la tape mientras no está expandido sobre ella.
+    var drawerEl = document.querySelector('.dc-drawer');
+    var drawerH = drawerEl ? drawerEl.getBoundingClientRect().height : 0;
+    root.style.setProperty('--drawer-toggle-height', drawerH + 'px');
+  }
+
+  /** App React (index.html) con marco activo: la página NUNCA debe
+   * desplazarse como documento completo. Si se desplaza (p.ej. el
+   * navegador restaura la posición de scroll al recargar, o un
+   * elemento sobresale unos px), el header del saldo sube y queda
+   * escondido DETRÁS de la barra Chrome (que es fixed y siempre está
+   * arriba). Se bloquea el scroll del documento y se vuelve a 0;
+   * el scroll interno de cada panel de la app sigue funcionando
+   * igual. home.html / options.html (bf-static-page) sí necesitan
+   * desplazarse, así que ahí no se bloquea nada. */
+  function shouldLockScroll() {
+    var body = document.body;
+    return body.classList.contains('bf-active') && !body.classList.contains('bf-static-page');
+  }
+
+  function resetDocumentScroll() {
+    if (!shouldLockScroll()) return;
+    if (window.scrollX !== 0 || window.scrollY !== 0) window.scrollTo(0, 0);
+    if (document.documentElement.scrollTop) document.documentElement.scrollTop = 0;
+    if (document.body.scrollTop) document.body.scrollTop = 0;
+  }
+
+  function updateScrollLock() {
+    var lock = shouldLockScroll();
+    root.classList.toggle('bf-lock-scroll', lock);
+    try {
+      if ('scrollRestoration' in window.history) {
+        window.history.scrollRestoration = lock ? 'manual' : 'auto';
+      }
+    } catch (err) {
+      /* no crítico */
+    }
+    resetDocumentScroll();
+  }
+
+  function apply(mode) {
+    var body = document.body;
+    var existingTop = document.querySelector('.bf-top');
+    if (existingTop) existingTop.remove();
+    unstackNav();
+    var existingBottom = document.querySelector('.bf-bottom');
+    if (existingBottom) existingBottom.remove();
+
+    body.classList.remove('bf-active', 'bf-chrome', 'bf-safari');
+    root.classList.remove('bf-lock-scroll');
+
+    if (mode === 'none') {
+      // Sin marco: no se agrega ninguna clase ni barra, así que
+      // ninguna de las reglas de browser-frame.css (padding-top,
+      // padding-bottom, desplazamientos del menú/Run/drawer, etc.) se
+      // activa. El layout queda exactamente como si este sistema no
+      // existiera — limpio y organizado, tal cual estaba antes de
+      // elegir Chrome o Safari.
+      measureAndSetVars();
+      return;
+    }
+
+    body.classList.add('bf-active');
+    body.classList.add(mode === 'safari' ? 'bf-safari' : 'bf-chrome');
+
+    // Chrome: solo barra superior (el menú de la app se queda donde
+    // siempre estuvo, fixed, no hace falta tocarlo).
+    // Safari: solo barra inferior, apilada DEBAJO del menú real en el
+    // mismo contenedor de flujo — nunca fixed+offset calculado.
+    if (mode === 'safari') {
+      placeSafariBar(buildBottomBar());
+    } else {
+      body.insertBefore(buildTopBar(), body.firstChild);
+    }
+
+    wireEditableHost();
+    updateScrollLock();
+
+    // Medir de inmediato (getBoundingClientRect fuerza un reflow síncrono
+    // con el valor ya correcto) — así no hay ni un frame de solapamiento
+    // entre insertar la barra y reservarle su espacio real.
+    measureAndSetVars();
+  }
+
+  // Hace editable el texto de la barra simulada (.bf-host, ya
+  // contenteditable en el HTML). Solo cambia ESTE texto propio de la
+  // app — nunca window.location ni la URL real del navegador.
+  function wireEditableHost() {
+    var hosts = document.querySelectorAll('.bf-host');
+    for (var i = 0; i < hosts.length; i++) {
+      (function (el) {
+        var valueBeforeEdit = el.textContent;
+
+        el.addEventListener('focus', function () {
+          valueBeforeEdit = el.textContent;
+        });
+
+        el.addEventListener('keydown', function (e) {
+          if (e.key === 'Enter') {
+            e.preventDefault();
+            el.blur(); // dispara 'blur' -> guarda
+          } else if (e.key === 'Escape') {
+            e.preventDefault();
+            el.textContent = valueBeforeEdit;
+            el.blur();
+          }
+        });
+
+        el.addEventListener('blur', function () {
+          var saved = setSimulatedText(el.textContent);
+          el.textContent = saved;
+          // Mantiene todas las demás barras (top/bottom) sincronizadas
+          // con el mismo texto, si hubiera más de una en el DOM.
+          var all = document.querySelectorAll('.bf-host');
+          for (var j = 0; j < all.length; j++) {
+            all[j].textContent = saved;
+          }
+        });
+      })(hosts[i]);
+    }
+  }
+
+  function handleViewportChange() {
+    requestAnimationFrame(measureAndSetVars);
+  }
+
+  /* ---- Selector "Aspecto" (sheet inferior con overlay) ---- */
+  function buildSelector() {
+    if (document.getElementById('bfOverlay')) return;
+
+    var overlay = document.createElement('div');
+    overlay.className = 'bf-overlay';
+    overlay.id = 'bfOverlay';
+
+    var current = getMode();
+
+    overlay.innerHTML =
+      '<div class="bf-sheet">' +
+      '  <h3>Aspecto</h3>' +
+      '  <div class="bf-option none-preview" data-mode="none">' +
+      '    <div class="bf-preview"><div class="bf-preview-body" style="height:100%"></div></div>' +
+      '    <div class="bf-option-info"><div class="bf-option-name">Ninguno</div><div class="bf-option-desc">Sin marco de navegador (predeterminado)</div></div>' +
+      '    <div class="bf-radio">✓</div>' +
+      '  </div>' +
+      '  <div class="bf-option chrome-preview" data-mode="chrome">' +
+      '    <div class="bf-preview"><div class="bf-preview-top"></div><div class="bf-preview-body"></div><div class="bf-preview-bottom"></div></div>' +
+      '    <div class="bf-option-info"><div class="bf-option-name">Chrome</div><div class="bf-option-desc">Barra de navegador arriba</div></div>' +
+      '    <div class="bf-radio">✓</div>' +
+      '  </div>' +
+      '  <div class="bf-option safari-preview" data-mode="safari">' +
+      '    <div class="bf-preview"><div class="bf-preview-top"></div><div class="bf-preview-body"></div><div class="bf-preview-bottom"></div></div>' +
+      '    <div class="bf-option-info"><div class="bf-option-name">Safari</div><div class="bf-option-desc">Barra de navegador abajo</div></div>' +
+      '    <div class="bf-radio">✓</div>' +
+      '  </div>' +
+      '  <button class="bf-save-btn" id="bfSaveBtn">GUARDAR</button>' +
+      '</div>';
+
+    document.body.appendChild(overlay);
+
+    var options = overlay.querySelectorAll('.bf-option');
+    function markSelected(mode) {
+      options.forEach(function (opt) {
+        opt.classList.toggle('selected', opt.getAttribute('data-mode') === mode);
+      });
+    }
+    markSelected(current);
+
+    var pendingMode = current;
+    options.forEach(function (opt) {
+      opt.addEventListener('click', function () {
+        pendingMode = opt.getAttribute('data-mode');
+        markSelected(pendingMode);
+      });
+    });
+
+    overlay.addEventListener('click', function (e) {
+      if (e.target === overlay) closeSelector();
+    });
+
+    document.getElementById('bfSaveBtn').addEventListener('click', function () {
+      setMode(pendingMode);
+      apply(pendingMode);
+      closeSelector();
+    });
+  }
+
+  function openSelector() {
+    buildSelector();
+    var overlay = document.getElementById('bfOverlay');
+    if (overlay) overlay.classList.add('open');
+  }
+
+  function closeSelector() {
+    var overlay = document.getElementById('bfOverlay');
+    if (overlay) overlay.classList.remove('open');
+  }
+
+  /** window.matchMedia('(display-mode: standalone)') cubre PWA
+   * instaladas en Android/desktop; navigator.standalone es el
+   * equivalente específico de iOS Safari. */
+  function isRunningAsPwa() {
+    try {
+      if (window.navigator.standalone === true) return true;
+      return window.matchMedia && window.matchMedia('(display-mode: standalone)').matches;
+    } catch (err) {
+      return false;
+    }
+  }
+
+  function applyPwaClass() {
+    document.body.classList.toggle('bf-pwa-standalone', isRunningAsPwa());
+  }
+
+  function init() {
+    root.style.setProperty('--browser-frame-top-height', '0px');
+    root.style.setProperty('--browser-frame-bottom-height', '0px');
+    root.style.setProperty('--app-header-height', '72px');
+    root.style.setProperty('--app-header-bottom', '72px');
+    applyPwaClass();
+    apply(getMode());
+
+    // Recalcular ante cualquier cambio real de layout: resize, cambio de
+    // orientación, o cuando el navegador muestra/oculta su propia UI
+    // (barra de direcciones móvil) y el viewport visual cambia de alto.
+    window.addEventListener('resize', handleViewportChange);
+    window.addEventListener('orientationchange', handleViewportChange);
+
+    // Al recargar con el marco ya activo, el navegador puede restaurar
+    // una posición de scroll vieja DESPUÉS de este script (y React monta
+    // el header más tarde). Se vuelve a 0 y se re-mide en cada uno de
+    // esos momentos, y ante cualquier intento de desplazar el documento.
+    window.addEventListener('scroll', function () {
+      if (!shouldLockScroll()) return;
+      resetDocumentScroll();
+      handleViewportChange();
+    }, { passive: true });
+    window.addEventListener('load', function () {
+      resetDocumentScroll();
+      measureAndSetVars();
+    });
+    window.addEventListener('pageshow', function () {
+      resetDocumentScroll();
+      measureAndSetVars();
+    });
+
+    // Navegación por posición dentro de .mobile-bottom-nav: el mismo
+    // orden que usa hash=['dashboard','bot_builder','chart',...] en
+    // main.tsx. No se usa el texto del botón (se traduce según el
+    // idioma) ni un id — solo su posición, que es estable.
+    var NAV_ITEM_HASH_BY_INDEX = { 1: 'dashboard', 2: 'bot_builder', 3: 'chart' };
+
+    // Captura el click ANTES de que la app procese su propio manejador
+    // (fase de captura, en el document) — así la barra simulada se
+    // actualiza en el mismo instante del click, sin esperar al ciclo
+    // de render de React ni a que la app dispare su propio hashchange.
+    document.addEventListener('click', function (e) {
+      var nav = e.target.closest ? e.target.closest('.mobile-bottom-nav') : null;
+      var item = e.target.closest ? e.target.closest('.mobile-bottom-nav__item') : null;
+      if (!nav || !item) return;
+
+      var children = Array.prototype.slice.call(nav.children);
+      var index = children.indexOf(item);
+      var targetHash = NAV_ITEM_HASH_BY_INDEX[index];
+      if (!targetHash) return; // Home (0) y Menu (4): no cambian de hash
+
+      // Actualiza el hash real de la URL — asignar .hash es SPA/
+      // client-side puro, nunca recarga la página. Si ya es el mismo
+      // hash, no se toca nada (evita un cambio duplicado).
+      if (window.location.hash !== '#' + targetHash) {
+        window.location.hash = targetHash;
+      }
+
+      // Actualiza el texto de la barra en el MISMO instante del click,
+      // sin esperar el evento 'hashchange' (que también se disparará
+      // enseguida y confirmará/sincronizará el mismo valor).
+      var newRoute = '/#' + targetHash;
+      var routeEls = document.querySelectorAll('.bf-route');
+      for (var i = 0; i < routeEls.length; i++) {
+        routeEls[i].textContent = newRoute;
+      }
+    }, true);
+
+    // Respaldo: sigue escuchando 'hashchange' para cubrir Atrás/
+    // Adelante del navegador y cualquier cambio de hash que no venga
+    // de un click en estos botones (ej. navegación interna de la app).
+    // Actualiza SOLO el texto de la ruta simulada (.bf-route) cuando la
+    // app navega entre secciones (#dashboard, #chart, #bot_builder...).
+    // Nunca toca .bf-host (el texto editable) ni .bf-prefix.
+    window.addEventListener('hashchange', function () {
+      var newRoute = getSimulatedRoute();
+      var routeEls = document.querySelectorAll('.bf-route');
+      for (var i = 0; i < routeEls.length; i++) {
+        routeEls[i].textContent = newRoute;
+      }
+    });
+    if (window.visualViewport) {
+      window.visualViewport.addEventListener('resize', handleViewportChange);
+    }
+    if (window.matchMedia) {
+      try {
+        window.matchMedia('(display-mode: standalone)').addEventListener('change', applyPwaClass);
+      } catch (err) {
+        /* Safari antiguo sin addEventListener en MediaQueryList — no crítico. */
+      }
+    }
+
+    // La app React (.app-header) todavía no existe cuando este script
+    // corre — React la monta después. Un MutationObserver recalcula en
+    // cuanto aparece (y ante cualquier cambio posterior de su tamaño,
+    // p.ej. si el header cambia de alto entre pestañas), sin depender
+    // de ganchos específicos de React.
+    if (window.MutationObserver) {
+      var pending = false;
+      var observer = new MutationObserver(function () {
+        if (pending) return;
+        pending = true;
+        requestAnimationFrame(function () {
+          pending = false;
+          measureAndSetVars();
+        });
+      });
+      observer.observe(document.body, { childList: true, subtree: true, attributes: true, attributeFilter: ['class'] });
+    }
+
+    // .dc-drawer anima su alto (transition: height 0.3s) al abrir o
+    // cerrar — medir justo al cambiar la clase captura un valor a
+    // mitad de la animación, no el final. Este listener delegado
+    // vuelve a medir exactamente cuando la transición de altura
+    // termina, sin importar qué elemento la disparó.
+    document.addEventListener('transitionend', function (e) {
+      if (e.propertyName === 'height' && e.target && e.target.classList && e.target.classList.contains('dc-drawer')) {
+        measureAndSetVars();
+      }
+    });
+  }
+
+  window.BrowserFrame = {
+    init: init,
+    apply: apply,
+    getMode: getMode,
+    setMode: setMode,
+    openSelector: openSelector,
+    closeSelector: closeSelector,
+  };
+})(window);

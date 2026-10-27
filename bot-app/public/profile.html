@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<base href="/">
+<link rel="icon" type="image/png" sizes="48x48" href="deriv-d-48.png">
+<link rel="icon" type="image/png" sizes="32x32" href="deriv-d-32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="deriv-d-16.png">
+<link rel="apple-touch-icon" href="deriv-d-180.png">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#ffffff">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Deriv Bot">
+<!-- Acelera la navegación hacia el bot-app (pestaña Chart): ver home.html. -->
+<link rel="preconnect" href="https://api.derivws.com" crossorigin>
+<link rel="dns-prefetch" href="https://api.derivws.com">
+<link rel="preconnect" href="https://auth.deriv.com">
+<link rel="dns-prefetch" href="https://auth.deriv.com">
+<link rel="prefetch" href="/">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Profile | Deriv</title>
+<link rel="stylesheet" href="assets/sim/css/browser-frame.css?v=20261017zr">
+<link rel="stylesheet" href="assets/sim/css/deriv-desktop.css?v=20261017zr">
+<link rel="stylesheet" href="assets/sim/css/deriv-mobile.css?v=20261017zr" media="(max-width:860px)">
+<link rel="stylesheet" href="assets/sim/css/deriv-icons.css?v=20261017zr">
+</head>
+<body class="bf-static-page" data-page="profile">
+<script src="assets/sim/js/sim-shared.js?v=20261017zr"></script>
+<script src="assets/sim/js/browser-frame.js?v=20261017zr"></script>
+<script>BrowserFrame.init();</script>
+<div class="dd-shell">
+  <div id="ddSidebar"></div>
+  <main class="dd-main">
+    <section class="pr-hero">
+      <a class="pr-back" href="home.html" aria-label="Volver"><i class="ic ic-pr_back"></i></a>
+      <div class="pr-avatar"><img src="assets/sim/img/v/avatar_big.png" alt=""></div>
+      <div class="pr-name" id="prName">&nbsp;</div>
+      <div class="pr-id">019f....5063<i class="ic ic-pr_copy"></i></div>
+    </section>
+
+    <section class="pr-group"><h3>Sobre ti</h3>
+      <a class="pr-item" href="datos-personales.html"><i class="ic ic-pr_datos"></i><div class="t">Datos personales</div><i class="ic ic-pr_chev"></i></a>
+      <div class="pr-item"><i class="ic ic-pr_dir"></i><div class="t">Dirección de casa</div><i class="ic ic-pr_chev"></i></div>
+      <div class="pr-item"><i class="ic ic-pr_info"></i><div class="t">Información adicional</div><i class="ic ic-pr_chev"></i></div>
+      <div class="pr-item"><i class="ic ic-pr_fiscal"></i><div class="t">Información fiscal</div><i class="ic ic-pr_chev"></i></div>
+    </section>
+
+    <section class="pr-group"><h3>Verificación</h3>
+      <div class="pr-item two"><i class="ic ic-pr_id"></i><div class="t">Prueba de identidad<small class="ok">Verificado</small></div><i class="ic ic-pr_chev"></i></div>
+      <div class="pr-item two"><i class="ic ic-pr_dom"></i><div class="t">Comprobante de domicilio<small class="ok">Verificado</small></div><i class="ic ic-pr_chev"></i></div>
+    </section>
+
+    <section class="pr-group"><h3>Evaluación</h3>
+      <div class="pr-item two"><i class="ic ic-pr_eval"></i><div class="t">Evaluación financiera<small class="">Incompleto</small></div><i class="ic ic-pr_chev"></i></div>
+    </section>
+
+    <section class="pr-group"><h3>Seguridad</h3>
+      <div class="pr-item"><i class="ic ic-pr_pass"></i><div class="t">Cambiar contraseña</div><i class="ic ic-pr_chev"></i></div>
+      <div class="pr-item disabled two"><i class="ic ic-pr_mail"></i><div class="t">Dirección de correo<small id="prMail">&nbsp;</small></div><i class="ic ic-pr_chev"></i></div>
+      <div class="pr-item two"><i class="ic ic-pr_phone"></i><div class="t">Cambiar número de teléfono<small class="">+573166219962</small></div><i class="ic ic-pr_chev"></i></div>
+      <div class="pr-item"><i class="ic ic-pr_key"></i><div class="t">Claves de acceso</div><i class="ic ic-pr_chev"></i></div>
+      <div class="pr-item"><i class="ic ic-pr_2fa"></i><div class="t">Autenticación de dos factores</div><i class="ic ic-pr_chev"></i></div>
+      <div class="pr-item"><i class="ic ic-pr_close"></i><div class="t">Cerrar cuenta</div><i class="ic ic-pr_chev"></i></div>
+    </section>
+
+    <section class="pr-group"><h3>Gestión de API</h3>
+      <div class="pr-item"><i class="ic ic-pr_apps"></i><div class="t">Aplicaciones conectadas</div><i class="ic ic-pr_chev"></i></div>
+      <div class="pr-item"><i class="ic ic-pr_token"></i><div class="t">Ficha API</div><i class="ic ic-pr_chev"></i></div>
+      <div class="pr-item"><i class="ic ic-pr_api"></i><div class="t">Explorar la API Deriv</div><i class="ic ic-pr_ext"></i></div>
+    </section>
+
+  </main>
+</div>
+<div id="ddBottomNav"></div>
+<script src="assets/sim/js/deriv-shell.js?v=20261017zr"></script>
+<script>
+  // Nombre y correo de la cuenta que inició sesión (los mismos que muestra la barra lateral).
+  (function(){
+    var n = document.getElementById('prName'), m = document.getElementById('prMail');
+    function paint(){
+      var sn = document.getElementById('ddUserName'), sm = document.getElementById('ddUserMail');
+      if(sn && sn.textContent.trim()) n.textContent = sn.textContent;
+      if(sm && sm.textContent.trim()) m.textContent = sm.textContent;
+    }
+    paint();
+    document.addEventListener('dd:user', paint);
+  })();
+</script>
+</body>
+</html>

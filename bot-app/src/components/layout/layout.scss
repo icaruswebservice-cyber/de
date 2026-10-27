@@ -1,0 +1,121 @@
+@use 'components/shared/styles/mixins' as *;
+
+.layout {
+    display: flex;
+    flex-direction: column;
+    // CORRECCIÓN (marco Chrome activo): 100vh es el alto fijo de TODA la
+    // pantalla. Cuando el marco Chrome está activo, browser-frame.js le
+    // agrega al <body> un padding-top real igual a la altura de su barra
+    // simulada (--browser-frame-top-height) para no superponerse — pero
+    // este contenedor, al seguir pidiendo 100vh completos ADEMÁS de ese
+    // padding, terminaba sobresaliendo por abajo esa misma cantidad
+    // (contenido/menú empujados fuera de la pantalla visible, con scroll
+    // de página de por medio). Se descuenta esa altura para que el
+    // layout entero (header, contenido, menú) quede siempre dentro del
+    // espacio real visible, debajo de la barra simulada — nunca de más.
+    height: 100vh;
+    height: calc(100vh - var(--browser-frame-top-height, 0px));
+    height: calc(100dvh - var(--browser-frame-top-height, 0px));
+
+    .deriv-header {
+        background: var(--general-main-1);
+        height: 5.6rem;
+    }
+
+    // Escritorio: barra lateral izquierda fija (ver sidebar/sidebar.scss).
+    // Todo el contenido (header, pestañas, gráfico, footer) se corre a la
+    // derecha exactamente el ancho de la barra, sin superponerse.
+    &--with-sidebar {
+        --app-sidebar-width: 6.8rem;
+
+        padding-inline-start: var(--app-sidebar-width);
+        box-sizing: border-box;
+
+        .app-footer {
+            left: var(--app-sidebar-width);
+        }
+
+        // Gráfico con el panel de Run/Transactions abierto: main.scss le da
+        // 100vw - 39.8rem, sin contar la barra lateral. Así se metía 6.8rem
+        // DEBAJO del panel derecho y tapaba la columna de precios (eje
+        // derecho) y la etiqueta de precio que sigue al mouse. Se resta.
+        .dashboard__chart-wrapper--expanded {
+            width: calc(100vw - 39.8rem - var(--app-sidebar-width));
+        }
+
+        // El área de Blockly calculaba su ancho con 100vw completo.
+        #scratch_div {
+            width: calc(100vw - 3.2rem - var(--app-sidebar-width));
+        }
+
+        // Sin la fila del header (deriv-wrapper__left / __right): la
+        // cuenta (Real account + saldo) y "Deposit" quedan en la MISMA
+        // fila de las pestañas (Dashboard, Bot Builder, Charts,
+        // Tutorials), a la derecha, como en el Deriv Bot original. El
+        // header sale del flujo, así que todo el contenido sube y gana
+        // ese alto (5.6rem) — .main ahora solo descuenta el footer.
+        .deriv-header.app-header--desktop {
+            position: fixed;
+            top: calc(var(--browser-frame-top-height, 0px) + 1.6rem);
+            right: 1.6rem;
+            left: auto;
+            width: auto;
+            height: 5rem;
+            padding: 0;
+            background: transparent;
+            border: none;
+            box-shadow: none;
+            z-index: 3;
+
+            .deriv-wrapper__left {
+                display: none;
+            }
+        }
+
+        .main {
+            height: calc(100vh - 3.6rem - var(--browser-frame-top-height, 0px));
+        }
+
+        // El contenido de la izquierda (gráfico, Dashboard, Bot Builder)
+        // gana los 5.6rem que ocupaba el header: mismos cálculos de
+        // app.scss / workspace.scss, restando 5.6rem menos.
+        .bot {
+            --tab-content-height: calc(100vh - 11rem);
+            --bot-content-height: calc(100vh - 84px);
+        }
+
+        .injectionDiv {
+            height: calc(100vh - 10.8rem);
+        }
+
+        // Columna derecha (Run + Summary/Transactions/Journal): antes iba
+        // alineada con la fila de pestañas; ahora esa fila la ocupa la
+        // cuenta y Deposit, así que baja justo debajo de ella — queda en
+        // la misma posición de pantalla en la que estaba antes.
+        .main__run-strategy-wrapper {
+            top: 7.2rem;
+        }
+
+        // .bot-dashboard en el selector para ganarle a la regla de
+        // dashboard.scss (.bot-dashboard .run-panel__container, !important).
+        .bot-dashboard .run-panel__container {
+            // Mismo alto que tenía antes (no hereda los 5.6rem extra del
+            // contenido izquierdo), para que termine justo antes del footer.
+            height: calc(100vh - 16.6rem) !important;
+        }
+
+        // Dashboard: el panel derecho de guías ("Welcome to ...") empieza
+        // debajo de Run, en la misma posición en la que estaba antes.
+        .tab__dashboard__info-panel {
+            margin-top: 5.6rem;
+        }
+    }
+
+    &.quick-strategy-active {
+        .deriv-header {
+            @include mobile-or-tablet-screen {
+                z-index: 10000;
+            }
+        }
+    }
+}

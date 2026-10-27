@@ -1,0 +1,91 @@
+// Barra lateral izquierda (solo escritorio). Fija a la izquierda, de arriba
+// (debajo de la barra Chrome simulada, si está activa) hasta abajo. El resto
+// del layout se corre a la derecha con .layout--with-sidebar (layout.scss).
+.app-sidebar {
+    position: fixed;
+    top: var(--browser-frame-top-height, 0px);
+    bottom: var(--browser-frame-bottom-height, 0px);
+    left: 0;
+    width: var(--app-sidebar-width, 6.8rem);
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 1.2rem 0;
+    background: var(--general-main-1);
+    border-inline-end: 1px solid var(--general-section-1);
+    z-index: 3; // por encima del footer (z-index 2), debajo de modales/drawers
+
+    &__section {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.4rem;
+
+        &--bottom {
+            gap: 1.2rem;
+        }
+    }
+
+    &__logo {
+        display: flex;
+        justify-content: center;
+        margin-bottom: 1.6rem;
+
+        // El logo del header trae padding lateral y el nombre de la app;
+        // aquí solo se muestra la marca, centrada.
+        .app-header__logo {
+            padding: 0;
+        }
+
+        .app-header__logo-text {
+            display: none;
+        }
+
+        .app-header__logo-img {
+            max-width: 4rem;
+        }
+    }
+
+    &__item {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 0.2rem;
+        width: 100%;
+        min-height: 5.6rem;
+        padding: 0.6rem 0.2rem;
+        box-sizing: border-box;
+        background: none;
+        border: none;
+        cursor: pointer;
+        text-decoration: none;
+        color: var(--text-general);
+
+        svg {
+            flex: none;
+            fill: var(--text-general);
+        }
+
+        &:hover {
+            background: var(--general-hover);
+
+            .app-sidebar__label {
+                color: var(--text-prominent);
+            }
+
+            svg {
+                fill: var(--text-prominent);
+            }
+        }
+    }
+
+    &__label {
+        font-size: 1.2rem;
+        line-height: 1.6rem;
+        color: var(--text-general);
+        text-align: center;
+        white-space: nowrap;
+    }
+}

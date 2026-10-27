@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<base href="/">
+<link rel="icon" type="image/png" sizes="48x48" href="deriv-d-48.png">
+<link rel="icon" type="image/png" sizes="32x32" href="deriv-d-32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="deriv-d-16.png">
+<link rel="apple-touch-icon" href="deriv-d-180.png">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#ffffff">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Deriv Bot">
+<!-- Acelera la navegación hacia el bot-app (pestaña Chart): ver home.html. -->
+<link rel="preconnect" href="https://api.derivws.com" crossorigin>
+<link rel="dns-prefetch" href="https://api.derivws.com">
+<link rel="preconnect" href="https://auth.deriv.com">
+<link rel="dns-prefetch" href="https://auth.deriv.com">
+<link rel="prefetch" href="/">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Exchange | Deriv</title>
+<link rel="stylesheet" href="assets/sim/css/browser-frame.css?v=20261017zr">
+<link rel="stylesheet" href="assets/sim/css/deriv-desktop.css?v=20261017zr">
+<link rel="stylesheet" href="assets/sim/css/deriv-mobile.css?v=20261017zr" media="(max-width:860px)">
+<link rel="stylesheet" href="assets/sim/css/deriv-icons.css?v=20261017zr">
+</head>
+<body class="bf-static-page" data-page="exchange">
+<script src="assets/sim/js/sim-shared.js?v=20261017zr"></script>
+<script src="assets/sim/js/browser-frame.js?v=20261017zr"></script>
+<script>BrowserFrame.init();</script>
+<div class="dd-shell">
+  <div id="ddSidebar"></div>
+  <main class="dd-main">
+    <section class="dd-hero dd-hero-notoggle">
+      <div class="dd-hero-top" style="justify-content:flex-end;margin-bottom:0;height:0"><div class="dd-eye" id="eyeToggle" role="button" aria-label="Mostrar u ocultar saldo"><i class="ic ic-eye"></i></div></div>
+      <div class="dd-hero-skel"><div><i class="dd-skel"></i><b class="dd-skel"></b></div><div><i class="dd-skel"></i><b class="dd-skel"></b></div></div>
+      <div class="dd-hero-body">
+        <div class="header-text">
+          <div class="valor-total-label">Valor total estimado ›</div>
+          <div class="valor-total-amount"><span class="balance-amount" data-hideable data-hero-amount>0.00</span><span class="balance-currency">USD</span><i class="ic ic-refresh"></i></div>
+          <div class="valor-total-updated" id="updatedTxt">Actualizado ahora</div>
+        </div>
+        <div class="dd-hero-actions"><div class="dd-action"><div class="circle primary"><i class="ic ic-h_plus3"></i></div>Añadir fondos</div><div class="dd-action"><div class="circle ghost"><i class="ic ic-h_send"></i></div>Enviar</div></div>
+      </div>
+    </section>
+
+    <div class="ex-cols">
+      <section>
+        <div class="section-title" style="margin-bottom:0.625rem">Comprar y vender crypto</div>
+        <div class="ex-left">
+        <div class="ex-card">
+          <div class="ex-chips"><span class="ex-chip active">ETH</span><span class="ex-chip">BTC</span><span class="ex-chip">USDC</span><span class="ex-chip">USDT</span></div>
+          <div class="ex-pair"><img class="xcoin" src="assets/sim/img/v/coin_ltc.png" alt=""><div><b>LTC/ETH</b><small>0.02453 (0.08%) <em>▾</em></small></div><i class="ic ic-ex_chev"></i></div>
+          <div class="ex-field">
+            <div class="row"><span class="tk"><img class="xdot" src="assets/sim/img/v/coin_eth.png" alt="">Saldo de ETH Spot</span><span>0.00000000</span></div>
+            <div class="row"><span>Monto</span><span class="asset">ETH <i class="ic ic-ex_swap"></i></span></div>
+          </div>
+          <div class="ex-approx">≈ 0.000 LTC</div>
+          <div class="ex-pcts"><span>25%</span><span>50%</span><span>75%</span><span>100%</span></div>
+          <button class="ex-buy">Comprar</button>
+        </div>
+        <div class="ex-adv"><div><b>Modo avanzado</b><span>Órdenes límite, libro de órdenes, gráficos</span></div><i>›</i></div>
+        </div>
+      </section>
+      <section>
+        <div class="section-title" style="margin-bottom:0.625rem">Mercados</div>
+        <div class="ex-right">
+          <div class="ex-search"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="7" cy="7" r="5"/><path d="m11 11 3.5 3.5"/></svg>Buscar entre 38 pares</div>
+          <div class="ex-chips"><span class="ex-chip active">Tendencia</span><span class="ex-chip">Ganancias</span><span class="ex-chip">Pérdidas</span></div>
+          <div class="ex-th"><span>Moneda</span><span>Gráfico 24H</span><span>Precio 24H</span></div>
+          <div class="ex-tr"><div class="ex-coin"><img src="assets/sim/img/v/coin_doge.png" alt=""><div><b>DOGE/USDT</b><small>Vol. 345.28M</small></div></div><svg class="ex-spark" viewBox="0 0 124 54" preserveAspectRatio="none"><defs><linearGradient id="gdoge" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#e4375f" stop-opacity=".14"/><stop offset="1" stop-color="#e4375f" stop-opacity="0"/></linearGradient></defs><polygon points="4,54 4,25.0 5,25.0 6,25.0 7,25.0 8,25.0 9,25.0 10,25.0 11,25.0 12,25.0 13,25.0 14,25.0 15,25.0 16,25.0 17,25.0 18,25.0 19,25.0 20,26.5 21,26.5 22,26.5 23,26.5 24,26.5 25,26.3 26,26.3 27,25.8 28,25.0 29,25.0 30,25.0 31,25.0 32,25.0 33,25.0 34,25.0 35,25.0 36,25.0 37,25.0 38,24.7 39,24.7 40,24.7 41,24.7 42,24.7 43,24.7 44,24.5 45,24.5 46,24.4 47,24.3 48,24.3 49,24.5 50,24.7 51,25.0 52,25.0 53,25.1 54,26.2 55,26.2 56,26.2 57,26.2 58,25.0 59,25.0 60,25.0 61,25.0 62,25.0 63,25.0 64,25.0 65,25.0 66,25.0 67,25.0 68,26.4 69,26.5 70,26.5 71,26.5 72,26.7 73,26.7 74,26.7 75,26.5 76,26.5 77,26.5 78,26.5 79,26.2 80,26.4 81,26.3 82,26.5 83,26.5 84,26.7 85,27.0 86,28.1 87,28.5 88,29.0 89,29.8 90,30.6 91,30.7 92,31.0 93,31.0 94,31.0 95,31.0 96,32.5 97,32.5 98,32.5 99,32.5 100,32.7 101,33.0 102,33.0 103,33.0 104,33.0 105,32.6 106,32.5 107,32.0 108,31.0 109,30.7 110,31.0 111,31.0 112,32.5 113,32.7 114,33.0 115,33.0 116,33.0 117,33.0 118,34.1 119,34.0 119,54" fill="url(#gdoge)"/><polyline points="4,25.0 5,25.0 6,25.0 7,25.0 8,25.0 9,25.0 10,25.0 11,25.0 12,25.0 13,25.0 14,25.0 15,25.0 16,25.0 17,25.0 18,25.0 19,25.0 20,26.5 21,26.5 22,26.5 23,26.5 24,26.5 25,26.3 26,26.3 27,25.8 28,25.0 29,25.0 30,25.0 31,25.0 32,25.0 33,25.0 34,25.0 35,25.0 36,25.0 37,25.0 38,24.7 39,24.7 40,24.7 41,24.7 42,24.7 43,24.7 44,24.5 45,24.5 46,24.4 47,24.3 48,24.3 49,24.5 50,24.7 51,25.0 52,25.0 53,25.1 54,26.2 55,26.2 56,26.2 57,26.2 58,25.0 59,25.0 60,25.0 61,25.0 62,25.0 63,25.0 64,25.0 65,25.0 66,25.0 67,25.0 68,26.4 69,26.5 70,26.5 71,26.5 72,26.7 73,26.7 74,26.7 75,26.5 76,26.5 77,26.5 78,26.5 79,26.2 80,26.4 81,26.3 82,26.5 83,26.5 84,26.7 85,27.0 86,28.1 87,28.5 88,29.0 89,29.8 90,30.6 91,30.7 92,31.0 93,31.0 94,31.0 95,31.0 96,32.5 97,32.5 98,32.5 99,32.5 100,32.7 101,33.0 102,33.0 103,33.0 104,33.0 105,32.6 106,32.5 107,32.0 108,31.0 109,30.7 110,31.0 111,31.0 112,32.5 113,32.7 114,33.0 115,33.0 116,33.0 117,33.0 118,34.1 119,34.0" fill="none" stroke="#e4375f" stroke-width="1.3" stroke-linejoin="round" stroke-linecap="round" vector-effect="non-scaling-stroke"/></svg><div class="ex-price">0.08190<small class="down">-2.59%</small></div></div>
+          <div class="ex-tr"><div class="ex-coin"><img src="assets/sim/img/v/coin_trx.png" alt=""><div><b>TRX/USDT</b><small>Vol. 88.76M</small></div></div><svg class="ex-spark" viewBox="0 0 124 54" preserveAspectRatio="none"><defs><linearGradient id="gtrx" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#14d19c" stop-opacity=".14"/><stop offset="1" stop-color="#14d19c" stop-opacity="0"/></linearGradient></defs><polygon points="4,54 4,30.5 5,30.5 6,30.5 7,30.5 8,30.5 9,30.5 10,30.8 11,30.8 12,32.5 13,32.5 14,32.8 15,32.8 16,32.8 17,32.9 18,34.5 19,34.5 20,34.5 21,34.5 22,34.5 23,34.5 24,34.6 25,34.9 26,34.8 27,34.5 28,34.5 29,34.0 30,30.5 31,30.5 32,26.8 33,26.6 34,24.9 35,24.6 36,24.5 37,24.5 38,23.4 39,22.9 40,22.5 41,22.5 42,22.4 43,22.2 44,20.8 45,20.8 46,22.5 47,22.5 48,22.5 49,22.7 50,22.8 51,22.9 52,24.4 53,24.4 54,22.9 55,22.7 56,22.5 57,22.5 58,22.4 59,22.2 60,20.9 61,20.9 62,20.5 63,20.5 64,20.5 65,20.3 66,18.5 67,18.5 68,17.0 69,16.6 70,16.5 71,16.5 72,14.9 73,14.6 74,14.6 75,14.6 76,14.9 77,14.9 78,16.5 79,16.5 80,16.5 81,16.5 82,16.5 83,16.5 84,16.5 85,16.5 86,16.5 87,16.5 88,16.6 89,16.6 90,16.5 91,16.5 92,16.5 93,16.5 94,14.9 95,14.9 96,14.9 97,14.9 98,16.5 99,16.5 100,16.5 101,16.5 102,16.8 103,16.8 104,16.6 105,16.5 106,14.5 107,14.5 108,12.8 109,12.5 110,12.6 111,12.6 112,12.9 113,12.8 114,12.9 115,12.9 116,14.5 117,14.5 118,14.5 119,14.5 119,54" fill="url(#gtrx)"/><polyline points="4,30.5 5,30.5 6,30.5 7,30.5 8,30.5 9,30.5 10,30.8 11,30.8 12,32.5 13,32.5 14,32.8 15,32.8 16,32.8 17,32.9 18,34.5 19,34.5 20,34.5 21,34.5 22,34.5 23,34.5 24,34.6 25,34.9 26,34.8 27,34.5 28,34.5 29,34.0 30,30.5 31,30.5 32,26.8 33,26.6 34,24.9 35,24.6 36,24.5 37,24.5 38,23.4 39,22.9 40,22.5 41,22.5 42,22.4 43,22.2 44,20.8 45,20.8 46,22.5 47,22.5 48,22.5 49,22.7 50,22.8 51,22.9 52,24.4 53,24.4 54,22.9 55,22.7 56,22.5 57,22.5 58,22.4 59,22.2 60,20.9 61,20.9 62,20.5 63,20.5 64,20.5 65,20.3 66,18.5 67,18.5 68,17.0 69,16.6 70,16.5 71,16.5 72,14.9 73,14.6 74,14.6 75,14.6 76,14.9 77,14.9 78,16.5 79,16.5 80,16.5 81,16.5 82,16.5 83,16.5 84,16.5 85,16.5 86,16.5 87,16.5 88,16.6 89,16.6 90,16.5 91,16.5 92,16.5 93,16.5 94,14.9 95,14.9 96,14.9 97,14.9 98,16.5 99,16.5 100,16.5 101,16.5 102,16.8 103,16.8 104,16.6 105,16.5 106,14.5 107,14.5 108,12.8 109,12.5 110,12.6 111,12.6 112,12.9 113,12.8 114,12.9 115,12.9 116,14.5 117,14.5 118,14.5 119,14.5" fill="none" stroke="#14d19c" stroke-width="1.3" stroke-linejoin="round" stroke-linecap="round" vector-effect="non-scaling-stroke"/></svg><div class="ex-price">0.3339<small class="up">+1.74%</small></div></div>
+          <div class="ex-tr"><div class="ex-coin"><img src="assets/sim/img/v/coin_xrp.png" alt=""><div><b>XRP/USDT</b><small>Vol. 60.79M</small></div></div><svg class="ex-spark" viewBox="0 0 124 54" preserveAspectRatio="none"><defs><linearGradient id="gxrp" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#e4375f" stop-opacity=".14"/><stop offset="1" stop-color="#e4375f" stop-opacity="0"/></linearGradient></defs><polygon points="4,54 4,19.3 5,19.3 6,19.5 7,19.5 8,19.5 9,19.5 10,19.5 11,19.5 12,19.5 13,19.5 14,19.5 15,19.2 16,19.4 17,19.4 18,19.5 19,19.5 20,19.7 21,20.0 22,20.0 23,20.0 24,20.0 25,19.5 26,19.2 27,18.8 28,18.0 29,18.0 30,18.8 31,19.5 32,19.5 33,19.5 34,19.5 35,19.1 36,19.4 37,19.0 38,18.0 39,18.0 40,18.0 41,18.0 42,18.0 43,18.0 44,18.0 45,18.0 46,17.7 47,17.7 48,17.7 49,18.0 50,19.2 51,19.5 52,20.0 53,20.0 54,21.2 55,21.2 56,20.0 57,20.0 58,20.0 59,19.5 60,19.3 61,19.2 62,18.0 63,18.0 64,18.0 65,18.0 66,18.0 67,18.1 68,19.5 69,19.5 70,19.7 71,20.0 72,20.0 73,20.0 74,20.0 75,19.5 76,19.2 77,18.7 78,18.0 79,17.5 80,17.5 81,17.5 82,17.7 83,18.0 84,18.8 85,19.5 86,20.8 87,21.5 88,23.2 89,23.5 90,23.7 91,24.0 92,24.0 93,24.0 94,25.7 95,26.0 96,27.5 97,28.0 98,29.5 99,29.6 100,31.2 101,31.5 102,32.0 103,32.0 104,32.0 105,31.7 106,31.3 107,30.7 108,30.0 109,29.7 110,29.7 111,30.0 112,31.2 113,31.5 114,31.7 115,32.0 116,32.0 117,32.0 118,32.0 119,32.0 119,54" fill="url(#gxrp)"/><polyline points="4,19.3 5,19.3 6,19.5 7,19.5 8,19.5 9,19.5 10,19.5 11,19.5 12,19.5 13,19.5 14,19.5 15,19.2 16,19.4 17,19.4 18,19.5 19,19.5 20,19.7 21,20.0 22,20.0 23,20.0 24,20.0 25,19.5 26,19.2 27,18.8 28,18.0 29,18.0 30,18.8 31,19.5 32,19.5 33,19.5 34,19.5 35,19.1 36,19.4 37,19.0 38,18.0 39,18.0 40,18.0 41,18.0 42,18.0 43,18.0 44,18.0 45,18.0 46,17.7 47,17.7 48,17.7 49,18.0 50,19.2 51,19.5 52,20.0 53,20.0 54,21.2 55,21.2 56,20.0 57,20.0 58,20.0 59,19.5 60,19.3 61,19.2 62,18.0 63,18.0 64,18.0 65,18.0 66,18.0 67,18.1 68,19.5 69,19.5 70,19.7 71,20.0 72,20.0 73,20.0 74,20.0 75,19.5 76,19.2 77,18.7 78,18.0 79,17.5 80,17.5 81,17.5 82,17.7 83,18.0 84,18.8 85,19.5 86,20.8 87,21.5 88,23.2 89,23.5 90,23.7 91,24.0 92,24.0 93,24.0 94,25.7 95,26.0 96,27.5 97,28.0 98,29.5 99,29.6 100,31.2 101,31.5 102,32.0 103,32.0 104,32.0 105,31.7 106,31.3 107,30.7 108,30.0 109,29.7 110,29.7 111,30.0 112,31.2 113,31.5 114,31.7 115,32.0 116,32.0 117,32.0 118,32.0 119,32.0" fill="none" stroke="#e4375f" stroke-width="1.3" stroke-linejoin="round" stroke-linecap="round" vector-effect="non-scaling-stroke"/></svg><div class="ex-price">1.3263<small class="down">-2.96%</small></div></div>
+          <div class="ex-tr"><div class="ex-coin"><img src="assets/sim/img/v/coin_dogebtc.png" alt=""><div><b>DOGE/BTC</b><small>Vol. 59.14M</small></div></div><svg class="ex-spark" viewBox="0 0 124 54" preserveAspectRatio="none"><defs><linearGradient id="gdogebtc" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#e4375f" stop-opacity=".14"/><stop offset="1" stop-color="#e4375f" stop-opacity="0"/></linearGradient></defs><polygon points="4,54 4,10.0 5,10.0 6,10.0 7,10.0 8,10.0 9,10.0 10,10.0 11,10.0 12,10.0 13,10.0 14,10.0 15,10.0 16,10.0 17,10.0 18,10.0 19,10.0 20,10.0 21,10.0 22,10.0 23,10.0 24,10.0 25,10.0 26,10.0 27,10.0 28,10.0 29,10.0 30,10.0 31,10.0 32,10.0 33,10.0 34,10.0 35,10.0 36,10.0 37,10.0 38,10.0 39,10.0 40,10.0 41,10.0 42,10.0 43,10.0 44,10.0 45,10.0 46,10.0 47,10.0 48,10.0 49,10.0 50,10.0 51,10.0 52,10.0 53,10.0 54,10.0 55,10.0 56,10.0 57,10.0 58,10.0 59,10.0 60,10.0 61,10.0 62,10.0 63,10.0 64,10.0 65,10.0 66,10.0 67,10.0 68,10.0 69,10.0 70,10.0 71,10.0 72,10.0 73,10.0 74,10.0 75,10.0 76,10.0 77,10.0 78,10.0 79,10.0 80,10.0 81,10.0 82,10.0 83,10.0 84,12.6 85,14.4 86,26.8 87,31.0 88,38.6 89,39.7 90,40.0 91,40.0 92,40.0 93,40.0 94,40.0 95,40.0 96,40.0 97,40.0 98,40.0 99,40.0 100,40.0 101,40.0 102,40.0 103,39.5 104,38.6 105,37.3 106,26.4 107,24.0 108,12.0 109,11.9 110,16.4 111,19.4 112,32.5 113,35.2 114,39.6 115,40.0 116,40.0 117,40.0 118,40.0 119,40.0 119,54" fill="url(#gdogebtc)"/><polyline points="4,10.0 5,10.0 6,10.0 7,10.0 8,10.0 9,10.0 10,10.0 11,10.0 12,10.0 13,10.0 14,10.0 15,10.0 16,10.0 17,10.0 18,10.0 19,10.0 20,10.0 21,10.0 22,10.0 23,10.0 24,10.0 25,10.0 26,10.0 27,10.0 28,10.0 29,10.0 30,10.0 31,10.0 32,10.0 33,10.0 34,10.0 35,10.0 36,10.0 37,10.0 38,10.0 39,10.0 40,10.0 41,10.0 42,10.0 43,10.0 44,10.0 45,10.0 46,10.0 47,10.0 48,10.0 49,10.0 50,10.0 51,10.0 52,10.0 53,10.0 54,10.0 55,10.0 56,10.0 57,10.0 58,10.0 59,10.0 60,10.0 61,10.0 62,10.0 63,10.0 64,10.0 65,10.0 66,10.0 67,10.0 68,10.0 69,10.0 70,10.0 71,10.0 72,10.0 73,10.0 74,10.0 75,10.0 76,10.0 77,10.0 78,10.0 79,10.0 80,10.0 81,10.0 82,10.0 83,10.0 84,12.6 85,14.4 86,26.8 87,31.0 88,38.6 89,39.7 90,40.0 91,40.0 92,40.0 93,40.0 94,40.0 95,40.0 96,40.0 97,40.0 98,40.0 99,40.0 100,40.0 101,40.0 102,40.0 103,39.5 104,38.6 105,37.3 106,26.4 107,24.0 108,12.0 109,11.9 110,16.4 111,19.4 112,32.5 113,35.2 114,39.6 115,40.0 116,40.0 117,40.0 118,40.0 119,40.0" fill="none" stroke="#e4375f" stroke-width="1.3" stroke-linejoin="round" stroke-linecap="round" vector-effect="non-scaling-stroke"/></svg><div class="ex-price">0.00000100<small class="down">-0.99%</small></div></div>
+          <div class="ex-tr"><div class="ex-coin"><img src="assets/sim/img/v/coin_ada.png" alt=""><div><b>ADA/USDT</b><small>Vol. 52.47M</small></div></div><svg class="ex-spark" viewBox="0 0 124 54" preserveAspectRatio="none"><defs><linearGradient id="gada" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#e4375f" stop-opacity=".14"/><stop offset="1" stop-color="#e4375f" stop-opacity="0"/></linearGradient></defs><polygon points="4,54 4,14.0 5,14.0 6,14.0 7,14.0 8,14.0 9,14.0 10,14.0 11,14.0 12,14.0 13,14.0 14,14.0 15,14.0 16,14.8 17,15.5 18,15.5 19,15.5 20,16.0 21,16.0 22,16.0 23,16.0 24,16.0 25,15.5 26,14.9 27,14.5 28,14.0 29,14.0 30,14.0 31,14.0 32,14.0 33,14.0 34,14.0 35,14.0 36,14.0 37,13.7 38,13.7 39,13.7 40,14.0 41,14.0 42,14.0 43,14.4 44,15.3 45,15.3 46,15.3 47,14.8 48,15.5 49,15.5 50,15.7 51,16.0 52,17.7 53,17.7 54,18.0 55,18.0 56,18.0 57,18.0 58,17.7 59,17.5 60,17.5 61,17.1 62,17.3 63,17.4 64,17.5 65,17.5 66,17.5 67,17.6 68,18.0 69,18.0 70,18.0 71,18.0 72,18.0 73,18.0 74,18.0 75,18.0 76,17.7 77,17.7 78,17.5 79,17.5 80,17.5 81,17.5 82,17.7 83,18.0 84,19.1 85,19.5 86,21.5 87,22.4 88,25.2 89,25.5 90,26.0 91,26.0 92,26.1 93,26.7 94,27.2 95,27.5 96,27.5 97,27.5 98,27.5 99,27.5 100,28.0 101,28.0 102,29.7 103,30.0 104,29.7 105,29.3 106,27.5 107,27.0 108,25.5 109,25.0 110,25.5 111,25.5 112,26.0 113,26.0 114,27.5 115,27.5 116,27.7 117,28.0 118,28.0 119,28.0 119,54" fill="url(#gada)"/><polyline points="4,14.0 5,14.0 6,14.0 7,14.0 8,14.0 9,14.0 10,14.0 11,14.0 12,14.0 13,14.0 14,14.0 15,14.0 16,14.8 17,15.5 18,15.5 19,15.5 20,16.0 21,16.0 22,16.0 23,16.0 24,16.0 25,15.5 26,14.9 27,14.5 28,14.0 29,14.0 30,14.0 31,14.0 32,14.0 33,14.0 34,14.0 35,14.0 36,14.0 37,13.7 38,13.7 39,13.7 40,14.0 41,14.0 42,14.0 43,14.4 44,15.3 45,15.3 46,15.3 47,14.8 48,15.5 49,15.5 50,15.7 51,16.0 52,17.7 53,17.7 54,18.0 55,18.0 56,18.0 57,18.0 58,17.7 59,17.5 60,17.5 61,17.1 62,17.3 63,17.4 64,17.5 65,17.5 66,17.5 67,17.6 68,18.0 69,18.0 70,18.0 71,18.0 72,18.0 73,18.0 74,18.0 75,18.0 76,17.7 77,17.7 78,17.5 79,17.5 80,17.5 81,17.5 82,17.7 83,18.0 84,19.1 85,19.5 86,21.5 87,22.4 88,25.2 89,25.5 90,26.0 91,26.0 92,26.1 93,26.7 94,27.2 95,27.5 96,27.5 97,27.5 98,27.5 99,27.5 100,28.0 101,28.0 102,29.7 103,30.0 104,29.7 105,29.3 106,27.5 107,27.0 108,25.5 109,25.0 110,25.5 111,25.5 112,26.0 113,26.0 114,27.5 115,27.5 116,27.7 117,28.0 118,28.0 119,28.0" fill="none" stroke="#e4375f" stroke-width="1.3" stroke-linejoin="round" stroke-linecap="round" vector-effect="non-scaling-stroke"/></svg><div class="ex-price">0.2283<small class="down">-3.22%</small></div></div>
+          <div class="ex-more">Ver más ›</div>
+        </div>
+      </section>
+    </div>
+
+    <div class="ex-promo">
+      <h3><img class="ex-badge" src="assets/sim/img/v/dxn_badge.png" alt="DXN">Opera más, mantén más tiempo</h3>
+      <p>Abre posiciones de hasta 50x tu saldo, en largo o en corto. Mantenlas el tiempo que quieras, sin vencimiento.</p>
+      <button class="dd-pill-btn">Prueba los futuros</button>
+      <img class="art" src="assets/sim/img/v/ex_dxn_art.png" alt="">
+    </div>
+
+  </main>
+</div>
+<div id="ddBottomNav"></div>
+<script src="assets/sim/js/deriv-shell.js?v=20261017zr"></script>
+
+</body>
+</html>

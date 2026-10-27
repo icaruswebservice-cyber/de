@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<base href="/">
+<link rel="icon" type="image/png" sizes="48x48" href="deriv-d-48.png">
+<link rel="icon" type="image/png" sizes="32x32" href="deriv-d-32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="deriv-d-16.png">
+<link rel="apple-touch-icon" href="deriv-d-180.png">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#ffffff">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Deriv Bot">
+<!-- Acelera la navegación hacia el bot-app (pestaña Chart): abre de una vez
+     la conexión con la API de Deriv y empieza a precargar la página raíz
+     (bundle de React) para que, al tocar "Deriv Bot"/Portfolio, gran parte
+     del trabajo de red ya esté hecho. -->
+<link rel="preconnect" href="https://api.derivws.com" crossorigin>
+<link rel="dns-prefetch" href="https://api.derivws.com">
+<link rel="preconnect" href="https://auth.deriv.com">
+<link rel="dns-prefetch" href="https://auth.deriv.com">
+<link rel="prefetch" href="/">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap">
+<script src="https://kit.fontawesome.com/69112f3248.js" crossorigin="anonymous"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Home | Deriv</title>
+<meta name="description" content="Simulador educativo independiente. No es Deriv ni ninguna plataforma de trading real, y no gestiona dinero real.">
+<link rel="stylesheet" href="assets/sim/css/browser-frame.css?v=20261017zr">
+<link rel="stylesheet" href="assets/sim/css/deriv-desktop.css?v=20261017zr">
+<link rel="stylesheet" href="assets/sim/css/deriv-mobile.css?v=20261017zr" media="(max-width:860px)">
+<link rel="stylesheet" href="assets/sim/css/deriv-icons.css?v=20261017zr">
+</head>
+<body class="bf-static-page" data-page="home">
+<script src="assets/sim/js/sim-shared.js?v=20261017zr"></script>
+<script src="assets/sim/js/browser-frame.js?v=20261017zr"></script>
+<script>BrowserFrame.init();</script>
+
+<div class="dd-shell">
+  <div id="ddSidebar"></div>
+
+  <main class="dd-main">
+
+    <!-- HEADER: saldo, ojo y accesos (antes "Haz tu primer depósito") -->
+    <section class="dd-hero">
+      <div class="dd-hero-top">
+        <div class="dd-toggle" id="acctToggle">
+          <button class="active" data-acct="real">Real</button>
+          <button data-acct="demo">Demo</button>
+        </div>
+        <div class="dd-eye" id="eyeToggle" role="button" aria-label="Mostrar u ocultar saldo"><i id="eyeIcon" class="ic ic-eye"></i></div>
+      </div>
+      <div class="dd-home-m">
+        <div class="hm-text">
+          <div class="hm-label">Valor total <i class="hm-chev">›</i></div>
+          <div class="hm-amount"><span class="balance-amount" id="totalValueBalanceM" data-value="2.98">2.98</span><span class="balance-currency">USD</span><i class="ic ic-refresh"></i></div>
+          <div class="hm-updated">Actualizado ahora</div>
+        </div>
+        <button class="hm-deposit" type="button">Deposit</button>
+      </div>
+      <div class="dd-hero-skel"><div><i class="dd-skel"></i><b class="dd-skel" style="border-radius:0.3125rem"></b></div><div><i class="dd-skel"></i><b class="dd-skel" style="border-radius:0.3125rem"></b></div></div>
+      <div class="dd-hero-body">
+        <div class="header-text">
+          <div class="valor-total-label">Valor total de las operaciones</div>
+          <div class="valor-total-amount">
+            <span class="balance-amount" id="totalValueBalance" data-value="2.98">2.98</span><span class="balance-currency">USD</span>
+            <i class="ic ic-refresh"></i>
+          </div>
+          <div class="valor-total-updated">Actualizado ahora</div>
+        </div>
+        <div class="dd-hero-actions">
+          <div class="dd-action deposit-btn-wrap"><div class="circle primary"><i class="ic ic-h_plus"></i></div>Depósito</div>
+          <div class="dd-action"><div class="circle ghost"><i class="ic ic-h_chart"></i></div>Comercio</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CUENTAS COMERCIALES -->
+    <section class="dd-section">
+      <div class="dd-section-head">
+        <div class="section-title big-title">Mis cuentas comerciales</div>
+        <div class="carousel-arrows"><button id="acPrev" aria-label="Anterior">‹</button><button id="acNext" aria-label="Siguiente">›</button></div>
+      </div>
+      <div class="accounts-scroll" id="accountsScroll">
+        <div class="account-card">
+          <div class="account-icon icon-options"><img src="assets/sim/img/Options.webp" alt="Options"></div>
+          <div class="account-name">Options</div>
+          <div class="account-balance"><span class="balance-amount" data-value="0.00">0.00</span><span class="balance-currency">USD</span></div>
+        </div>
+        <div class="account-card">
+          <div class="account-icon icon-tv"><img src="assets/sim/img/TradingView.webp" alt="TradingView"></div>
+          <div class="account-name">TradingView</div>
+          <div class="account-balance"><span class="balance-amount" data-value="0.00">0.00</span><span class="balance-currency">USD</span></div>
+        </div>
+        <div class="account-card">
+          <div class="account-icon icon-mts"><img src="assets/sim/img/MT5.webp" alt="MT5"></div>
+          <div class="account-name">CFDs | Standard</div>
+          <div class="account-balance"><span class="balance-amount" id="mt5TradingBalance" data-value="0.00">0.00</span><span class="balance-currency">USD</span></div>
+        </div>
+        <div class="account-card">
+          <div class="account-icon icon-dxn"><img class="dd-ico" src="assets/sim/img/v/dxn_icon.png" alt="DXN" style="width:100%;height:100%"></div>
+          <div class="account-name">Deriv Exchange</div>
+          <div class="account-balance"><span class="balance-amount" data-value="0.00">0.00</span><span class="balance-currency">USDT</span></div>
+        </div>
+        <div class="add-account-card"></div>
+      </div>
+    </section>
+
+    <!-- PROMO CAROUSEL (autoplay) -->
+    <div class="promo-wrapper" id="promoWrap">
+      <div class="promo-track" id="promoTrack">
+        <div class="promo-slide slide-exchange">
+          <video class="promo-art-vid" poster="assets/sim/video/promo_exchange.jpg" muted playsinline preload="auto" aria-hidden="true"><source src="assets/sim/video/promo_exchange.mp4" type="video/mp4"><source src="assets/sim/video/promo_exchange.webm" type="video/webm"></video></video>
+          <button class="promo-close" type="button" aria-label="Cerrar"></button>
+          <div class="promo-text">
+            <h3><span class="dd-badge-dxn"><img class="dd-ico" src="assets/sim/img/v/dxn_icon.png" alt="" style="width:100%;height:100%"></span>Deriv Exchange</h3>
+            <p>Compra, vende y opera con los pares cripto más populares en spot y futuros 24/7.</p>
+          </div>
+        </div>
+        <div class="promo-slide slide-tv">
+          <video class="promo-art-vid" poster="assets/sim/video/promo_tv.jpg" muted playsinline preload="auto" aria-hidden="true"><source src="assets/sim/video/promo_tv.mp4" type="video/mp4"><source src="assets/sim/video/promo_tv.webm" type="video/webm"></video></video>
+          <button class="promo-close" type="button" aria-label="Cerrar"></button>
+          <div class="promo-text">
+            <h3>TradingView</h3>
+            <p>Gráficos y herramientas avanzados para Derived Indices 24/7.</p>
+          </div>
+        </div>
+        <div class="promo-slide slide-spacex">
+          <video class="promo-art-vid" poster="assets/sim/video/promo_spacex.jpg" muted playsinline preload="auto" aria-hidden="true"><source src="assets/sim/video/promo_spacex.mp4" type="video/mp4"><source src="assets/sim/video/promo_spacex.webm" type="video/webm"></video></video>
+          <button class="promo-close" type="button" aria-label="Cerrar"></button>
+          <div class="promo-text">
+            <h3>CFDs de SpaceX</h3>
+            <p>Opera con el gigante espacial con apalancamiento competitivo.</p>
+          </div>
+        </div>
+        <div class="promo-slide slide-ai">
+          <video class="promo-art-vid" poster="assets/sim/video/promo_ai.jpg" muted playsinline preload="auto" aria-hidden="true"><source src="assets/sim/video/promo_ai.mp4" type="video/mp4"><source src="assets/sim/video/promo_ai.webm" type="video/webm"></video></video>
+          <button class="promo-close" type="button" aria-label="Cerrar"></button>
+          <div class="promo-text">
+            <h3 class="ai-title">Análisis de mercado con IA</h3>
+            <p>Obtén información basada en IA sobre Oro, BTC, Plata, ETH y más.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="promo-progress" id="promoProgress">
+      <div class="promo-dot"><span class="fill"></span></div>
+      <div class="promo-dot"><span class="fill"></span></div>
+      <div class="promo-dot"><span class="fill"></span></div>
+      <div class="promo-dot"><span class="fill"></span></div>
+    </div>
+
+    <!-- EXPLORAR -->
+    <section class="dd-section">
+      <div class="section-title big-title" style="margin-bottom:1.3125rem">Explorar Deriv</div>
+      <div class="explore-grid">
+        <div class="explore-item">
+          <div class="explore-icon"><span class="nuevo">Nuevo</span><img class="dxn-sm" src="assets/sim/img/v/dxn_icon.png" alt="DXN"></div>
+          <div class="explore-label">Exchange</div>
+        </div>
+        <div class="explore-item" onclick="window.location.href='options.html'">
+          <div class="explore-icon options-icon"><img src="assets/sim/img/Options.webp" alt="Options"></div>
+          <div class="explore-label">Options</div>
+        </div>
+        <div class="explore-item">
+          <div class="explore-icon tv-icon"><img src="assets/sim/img/TradingView.webp" alt="TradingView"></div>
+          <div class="explore-label">TradingView</div>
+        </div>
+        <div class="explore-item">
+          <div class="explore-icon mts-icon"><img src="assets/sim/img/SWF.webp" alt="Swap-Free"></div>
+          <div class="explore-label">Swap-Free</div>
+        </div>
+        <div class="explore-item">
+          <div class="explore-icon p2p-icon"><img src="assets/sim/img/P2P.webp" alt="P2P"></div>
+          <div class="explore-label">P2P</div>
+        </div>
+        <div class="explore-item">
+          <div class="explore-icon more-icon"><img src="assets/sim/img/more.png" alt="Más"></div>
+          <div class="explore-label">Más</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- LO MÁS DESTACADO -->
+    <section class="dd-section">
+      <div class="dd-section-head">
+        <div class="section-title big-title">Lo más destacado</div>
+        <div class="carousel-arrows"><button id="hlPrev" aria-label="Anterior">‹</button><button id="hlNext" aria-label="Siguiente">›</button></div>
+      </div>
+      <div class="highlights-scroll" id="highlightsScroll">
+        <div class="highlight-card">
+          <div class="highlight-image"><img src="assets/sim/img/v/hl_dxn.png" alt="DXN Futures"></div>
+          <div class="highlight-body">
+            <h4>DXN Futures</h4>
+            <p>Opera en largo o en corto con los principales pares, con un apalancamiento de hasta 50x.</p>
+            <div class="tag-row"><span class="tag">DXN</span><span class="tag">BTC</span><span class="tag">ETH</span><span class="tag">SOL</span></div>
+          </div>
+        </div>
+        <div class="highlight-card">
+          <div class="highlight-image metals-bg"><img src="assets/sim/img/metals.png" alt=""></div>
+          <div class="highlight-body">
+            <h4>Metales</h4>
+            <p>Metales clave. Spreads ajustados. Apalancamiento de hasta 1:800.</p>
+            <div class="tag-row"><span class="tag">MT5</span><span class="tag">Oro</span><span class="tag">Plata</span><span class="tag">Cobre</span></div>
+          </div>
+        </div>
+        <div class="highlight-card">
+          <div class="highlight-image indices-bg"><img src="assets/sim/img/us.png" alt="Índices de EE. UU."></div>
+          <div class="highlight-body">
+            <h4>Índices de EE. UU.</h4>
+            <p>Apalancamiento 1:400 y spreads mínimos históricos en los principales índices de EE. UU.</p>
+            <div class="tag-row"><span class="tag">US Tech 100</span><span class="tag">US SP 500</span></div>
+          </div>
+        </div>
+        <div class="highlight-card">
+          <div class="highlight-image zero-bg"><img src="assets/sim/img/zero.png" alt="Spread cero"></div>
+          <div class="highlight-body">
+            <h4>Spread cero</h4>
+            <p>Quédate con más de lo que ganas.</p>
+            <div class="tag-row"><span class="tag">CFDs</span><span class="tag">Desde 0 pips</span></div>
+          </div>
+        </div>
+        <div class="highlight-card">
+          <div class="highlight-image crypto-bg"><img src="assets/sim/img/crypto.png" alt="Transferencias cripto"></div>
+          <div class="highlight-body">
+            <h4>Transferencias cripto</h4>
+            <p>Depósitos y retiros rápidos. Comisiones bajas.</p>
+            <div class="tag-row"><span class="tag">SOL</span><span class="tag">ADA</span><span class="tag">BNB</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+</div>
+<div id="ddBottomNav"></div>
+
+  <div class="notif-panel" id="notifPanel">
+    <div class="notif-panel-header">
+      <button class="notif-back-btn" id="notifBack" aria-label="Volver"><i class="fa-solid fa-arrow-left"></i></button>
+      <div class="notif-title">Notificaciones <i class="fa-solid fa-chevron-down"></i></div>
+      <button class="notif-more-btn" aria-label="Más opciones"><i class="fa-solid fa-ellipsis"></i></button>
+    </div>
+    <div class="notif-body">
+      <div class="balance-manager-card" id="aspectoRow" style="cursor:pointer; display:flex; align-items:center; justify-content:space-between;" onclick="BrowserFrame.openSelector()">
+        <span class="balance-manager-name">Aspecto</span>
+        <i class="fa-solid fa-chevron-right" style="color:var(--text-muted); font-size:0.8125rem;"></i>
+      </div>
+
+      <div class="balance-manager-card">
+        <div class="balance-manager-header">
+          <span class="balance-manager-name">Porcentaje de ganancia</span>
+        </div>
+        <label style="display:flex; align-items:center; gap:0.5rem; margin-bottom:0.625rem; cursor:pointer;">
+          <input type="radio" name="winPercentMode" id="winPercentDefault" value="default">
+          <span style="font-size:0.875rem;">Predeterminado de Deriv — <span id="winPercentDefaultLabel">51.8%</span></span>
+        </label>
+        <label style="display:flex; align-items:center; gap:0.5rem; cursor:pointer;">
+          <input type="radio" name="winPercentMode" id="winPercentCustom" value="custom">
+          <span style="font-size:0.875rem;">Personalizada</span>
+        </label>
+        <input type="number" inputmode="decimal" min="0" max="100" step="0.1" class="balance-input" id="winPercentInput" placeholder="Porcentaje (0-100)" style="display:none; margin-top:0.625rem;">
+        <div class="balance-manager-feedback" id="winPercentFeedback"></div>
+      </div>
+
+      <div class="balance-manager-card">
+        <div class="balance-manager-header">
+          <span class="balance-manager-name">Cuenta Demo</span>
+          <span class="balance-manager-current"><span id="demoCurrentBalance">0.00</span> <small>USD</small></span>
+        </div>
+        <input type="number" inputmode="decimal" min="0" step="0.01" class="balance-input" id="demoAmountInput" placeholder="Monto en USD">
+        <div class="balance-manager-actions">
+          <button class="bal-btn bal-btn-sub" data-account="demo" data-action="restar">− Restar</button>
+          <button class="bal-btn bal-btn-add" data-account="demo" data-action="sumar">+ Sumar</button>
+          <button class="bal-btn bal-btn-set" data-account="demo" data-action="fijar">Fijar</button>
+        </div>
+        <div class="balance-manager-feedback" id="demoFeedback"></div>
+      </div>
+
+      <div class="balance-manager-card">
+        <div class="balance-manager-header">
+          <span class="balance-manager-name">Cuenta Real</span>
+          <span class="balance-manager-current"><span id="virtualCurrentBalance">0.00</span> <small>USD (sim)</small></span>
+        </div>
+        <input type="number" inputmode="decimal" min="0" step="0.01" class="balance-input" id="virtualAmountInput" placeholder="Monto virtual">
+        <div class="balance-manager-actions">
+          <button class="bal-btn bal-btn-sub" data-account="virtual" data-action="restar">− Restar</button>
+          <button class="bal-btn bal-btn-add" data-account="virtual" data-action="sumar">+ Sumar</button>
+          <button class="bal-btn bal-btn-set" data-account="virtual" data-action="fijar">Fijar</button>
+        </div>
+        <div class="balance-manager-feedback" id="virtualFeedback"></div>
+      </div>
+    </div>
+  </div>
+
+
+<script>window.TL_CUSTOM_EYE = true;</script>
+<script src="assets/sim/js/deriv-shell.js?v=20261017zr"></script>
+<script>
+  // ===== PROMO AUTOPLAY CAROUSEL =====
+  (function(){
+    const track = document.getElementById('promoTrack');
+    const dots = document.querySelectorAll('#promoProgress .promo-dot');
+    let index = 0;
+    const total = dots.length;
+    const duration = 4200;                       // medido en el video: ~4,2 s por tarjeta
+    const vids = track.querySelectorAll('video');
+    function playVideo(i){ vids.forEach((v, k) => { if (k === i) { try { v.currentTime = 0; const pr = v.play(); if (pr && pr.catch) pr.catch(()=>{}); } catch(_){} } else { v.pause(); } }); }
+    document.querySelectorAll('.promo-close').forEach(b => b.addEventListener('click', () => {
+      const w = document.getElementById('promoWrap'), pg = document.getElementById('promoProgress');
+      clearInterval(timer); w.style.transition = pg.style.transition = 'opacity .25s'; w.style.opacity = pg.style.opacity = 0;
+      setTimeout(() => { w.style.display = pg.style.display = 'none'; }, 260);
+    }));
+
+    function showSlide(i){
+      index = i;
+      track.style.transform = `translateX(-${i * 100}%)`;
+      playVideo(i);
+
+      dots.forEach((dot, idx) => {
+        const fill = dot.querySelector('.fill');
+        dot.classList.remove('active', 'filled');
+
+        if(idx === i){
+          dot.classList.add('active');
+          // start empty, then fill from left to right over 4s
+          fill.style.transition = 'none';
+          fill.style.animation = 'none';
+          fill.style.transform = 'scaleX(0)';
+          void fill.offsetWidth; // force reflow
+          fill.style.animation = 'fillBar 4.2s linear forwards';
+        } else if(idx < i){
+          // dot ya recorrido: conserva el color de la carga progresiva
+          dot.classList.add('filled');
+          fill.style.animation = 'none';
+          fill.style.transition = 'none';
+          fill.style.transform = 'scaleX(1)';
+        } else {
+          fill.style.animation = 'none';
+          fill.style.transition = 'none';
+          fill.style.transform = 'scaleX(0)';
+        }
+      });
+    }
+
+    showSlide(0);
+
+    const timer = setInterval(() => {
+      const next = (index + 1) % total;
+      showSlide(next);
+    }, duration);
+  })();
+
+  // ===== FLECHAS: cuentas y destacados =====
+  (function(){
+    function wire(scrollerId, prevId, nextId, cardSel){
+      const scroller = document.getElementById(scrollerId);
+      const prevBtn = document.getElementById(prevId);
+      const nextBtn = document.getElementById(nextId);
+      if(!scroller || !prevBtn || !nextBtn) return;
+      const step = () => scroller.querySelector(cardSel).offsetWidth + 10;
+      prevBtn.addEventListener('click', () => scroller.scrollBy({ left: -step(), behavior: 'smooth' }));
+      nextBtn.addEventListener('click', () => scroller.scrollBy({ left: step(), behavior: 'smooth' }));
+    }
+    wire('highlightsScroll', 'hlPrev', 'hlNext', '.highlight-card');
+    wire('accountsScroll', 'acPrev', 'acNext', '.account-card');
+  })();
+
+  // ===== SALDOS VIRTUALES: ojo + panel de Cuenta Demo / Cuenta Virtual =====
+  // Todo lo que gestiona este bloque es dinero simulado (ver sim-shared.js).
+  (function(){
+    let balancesHidden = false;
+    let currentAccount = 'real'; // selector Real/Demo del banner (Real = saldo virtual de siempre)
+    let lastData = null;
+
+    function applyVisibility(){
+      document.querySelectorAll('.balance-amount').forEach(el => {
+        if(el.dataset.value === undefined){ el.dataset.value = el.textContent.trim(); }
+        el.textContent = balancesHidden ? '******' : el.dataset.value;
+      });
+      document.querySelectorAll('.balance-currency').forEach(el => {
+        el.style.display = balancesHidden ? 'none' : '';
+      });
+    }
+
+    function renderBalances(data){
+      lastData = data;
+      const demoEl = document.getElementById('demoCurrentBalance');
+      const virtualEl = document.getElementById('virtualCurrentBalance');
+      const mt5El = document.getElementById('mt5TradingBalance');
+      const totalEl = document.getElementById('totalValueBalance');
+      if(demoEl) demoEl.textContent = TradeLabSim.formatMoney(data.demo);
+      if(virtualEl) virtualEl.textContent = TradeLabSim.formatMoney(data.virtual);
+      if(mt5El) mt5El.dataset.value = TradeLabSim.formatMoney(data.demo);
+      if(totalEl) totalEl.dataset.value = TradeLabSim.formatMoney(currentAccount === 'demo' ? data.demo : data.virtual + TradeLabSim.loadWallet().USD);
+      const totalElM = document.getElementById('totalValueBalanceM');
+      if(totalElM) totalElM.dataset.value = TradeLabSim.formatMoney(data.virtual + TradeLabSim.loadWallet().USD);
+      applyVisibility();
+    }
+
+    function refreshBalances(){
+      const data = TradeLabSim.loadBalances();
+      renderBalances(data);
+      return data;
+    }
+
+    function showFeedback(account, message, isError){
+      const el = document.getElementById(account + 'Feedback');
+      if(!el) return;
+      el.textContent = message;
+      el.classList.toggle('error', !!isError);
+      el.classList.add('show');
+      clearTimeout(el._fadeTimeout);
+      el._fadeTimeout = setTimeout(() => el.classList.remove('show'), 2200);
+    }
+
+    const eyeBtn = document.getElementById('eyeToggle');
+    const eyeIcon = document.getElementById('eyeIcon');
+    eyeBtn.addEventListener('click', () => {
+      balancesHidden = !balancesHidden;
+      applyVisibility();
+      eyeIcon.style.opacity = balancesHidden ? '.45' : '1';
+    });
+
+    document.querySelectorAll('#acctToggle button').forEach(btn => {
+      btn.addEventListener('click', () => {
+        currentAccount = btn.dataset.acct;
+        document.querySelectorAll('#acctToggle button').forEach(b => b.classList.toggle('active', b === btn));
+        if(lastData) renderBalances(lastData);
+      });
+    });
+
+    const bellBtn = document.getElementById('bellToggle');
+    const panel = document.getElementById('notifPanel');
+    const backBtn = document.getElementById('notifBack');
+
+    function openSettingsPanel(){
+      panel.classList.add('open');
+      document.body.classList.add('panel-open');
+      refreshBalances();
+    }
+    // En escritorio la campana abre el menú de notificaciones (deriv-shell.js); en móvil abre este panel.
+    bellBtn.addEventListener('click', openSettingsPanel);
+    window.DD_openSettings = openSettingsPanel;
+    if (location.hash === '#ajustes') { openSettingsPanel(); history.replaceState(null, '', location.pathname); }
+
+    backBtn.addEventListener('click', () => {
+      panel.classList.remove('open');
+      document.body.classList.remove('panel-open');
+    });
+
+    document.querySelectorAll('.bal-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const account = btn.dataset.account;
+        const action = btn.dataset.action;
+        const input = document.getElementById(account + 'AmountInput');
+        const result = TradeLabSim.applyAction(account, action, input.value);
+        if(result.ok){
+          renderBalances(result.data);
+          showFeedback(account, 'Guardado ✓ (simulado)', false);
+          input.value = '';
+        } else if(result.reason === 'insufficient'){
+          showFeedback(account, 'Saldo virtual insuficiente', true);
+        } else {
+          showFeedback(account, 'Ingresa un monto válido', true);
+        }
+      });
+    });
+
+    // Mantiene sincronizado si se cambia el saldo desde otra pestaña/página.
+    window.addEventListener('tradelab-sim:balances-updated', () => refreshBalances());
+    window.addEventListener('storage', (e) => { if(e.key === TradeLabSim.STORAGE_KEY) refreshBalances(); });
+
+    // ===== Porcentaje de ganancia =====
+    (function(){
+      const radioDefault = document.getElementById('winPercentDefault');
+      const radioCustom = document.getElementById('winPercentCustom');
+      const customInput = document.getElementById('winPercentInput');
+      const defaultLabel = document.getElementById('winPercentDefaultLabel');
+      if(!radioDefault || !radioCustom || !customInput) return;
+
+      defaultLabel.textContent = TradeLabSim.DEFAULT_WIN_PERCENT + '%';
+
+      function applyModeVisibility(){
+        customInput.style.display = radioCustom.checked ? 'block' : 'none';
+      }
+
+      function renderWinPercent(){
+        const current = TradeLabSim.loadWinPercent();
+        const isDefault = current === TradeLabSim.DEFAULT_WIN_PERCENT;
+        radioDefault.checked = isDefault;
+        radioCustom.checked = !isDefault;
+        if(!isDefault) customInput.value = current;
+        applyModeVisibility();
+      }
+
+      function showWinPercentFeedback(message, isError){
+        const el = document.getElementById('winPercentFeedback');
+        if(!el) return;
+        el.textContent = message;
+        el.classList.toggle('error', !!isError);
+        el.classList.add('show');
+        clearTimeout(el._fadeTimeout);
+        el._fadeTimeout = setTimeout(() => el.classList.remove('show'), 2200);
+      }
+
+      radioDefault.addEventListener('change', () => {
+        applyModeVisibility();
+        TradeLabSim.saveWinPercent(TradeLabSim.DEFAULT_WIN_PERCENT);
+        showWinPercentFeedback('Guardado ✓', false);
+      });
+
+      radioCustom.addEventListener('change', () => {
+        applyModeVisibility();
+        customInput.focus();
+      });
+
+      customInput.addEventListener('change', () => {
+        const ok = TradeLabSim.saveWinPercent(customInput.value);
+        if(ok){
+          showWinPercentFeedback('Guardado ✓', false);
+        } else {
+          showWinPercentFeedback('Ingresa un valor entre 0 y 100', true);
+        }
+      });
+
+      window.addEventListener('tradelab-sim:win-percent-updated', renderWinPercent);
+      renderWinPercent();
+    })();
+
+    refreshBalances();
+  })();
+
+</script>
+
+</body>
+</html>

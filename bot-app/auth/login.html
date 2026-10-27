@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#181c25">
+<link rel="icon" type="image/png" sizes="48x48" href="/favicon-48.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<title>Iniciar sesión</title>
+<style>
+  :root{
+    --bg-dark:#181c25;
+    --card:#20242f;
+    --field:#2a2e3a;
+    --red:#ff444f;
+    --red-dark:#e6222e;
+    --green:#00d0a3;
+    --text-light:#ffffff;
+    --text-muted:#9a9ca3;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  html,body{height:100%;}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    background:var(--bg-dark);
+    color:var(--text-light);
+    -webkit-font-smoothing:antialiased;
+    display:flex;align-items:center;justify-content:center;
+    min-height:100dvh;padding:24px 16px;
+  }
+  .card{
+    width:100%;max-width:400px;
+    background:var(--card);
+    border-radius:20px;
+    padding:32px 24px 28px;
+    box-shadow:0 20px 40px rgba(0,0,0,.35);
+    text-align:center;
+  }
+  .logo{width:56px;height:56px;border-radius:14px;margin:0 auto 18px;display:block;}
+  h1{font-size:22px;font-weight:700;margin-bottom:8px;}
+  p.sub{color:var(--text-muted);font-size:14px;line-height:1.45;margin-bottom:26px;}
+  .code{display:flex;gap:8px;justify-content:center;margin-bottom:18px;}
+  .code input{
+    width:46px;height:56px;
+    border-radius:12px;border:1.5px solid transparent;
+    background:var(--field);color:var(--text-light);
+    font-size:24px;font-weight:700;text-align:center;
+    outline:none;transition:border-color .15s,transform .15s;
+    caret-color:var(--red);
+  }
+  .code input:focus{border-color:var(--red);}
+  .code.error input{border-color:var(--red-dark);animation:shake .35s;}
+  @keyframes shake{25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}
+  .msg{min-height:20px;font-size:13px;color:var(--red);margin-bottom:14px;}
+  .msg.ok{color:var(--green);}
+  button{
+    width:100%;height:50px;border:0;border-radius:12px;
+    background:var(--red);color:#fff;font-size:16px;font-weight:700;cursor:pointer;
+    transition:background .15s,opacity .15s;
+  }
+  button:hover{background:var(--red-dark);}
+  button:disabled{opacity:.5;cursor:not-allowed;}
+  .note{margin-top:18px;color:var(--text-muted);font-size:12px;line-height:1.4;}
+  @media (max-width:360px){ .code input{width:40px;height:50px;font-size:20px;} }
+</style>
+</head>
+<body>
+  <main class="card">
+    <img class="logo" src="/logo.png" alt="" onerror="this.style.display='none'">
+    <h1>Iniciar sesión</h1>
+    <p class="sub">Ingresa el código de verificación de 6 dígitos que te entregó el administrador.</p>
+
+    <form id="loginForm" autocomplete="off" novalidate>
+      <div class="code" id="codeBoxes">
+        <input inputmode="numeric" pattern="[0-9]*" maxlength="1" aria-label="Dígito 1" autocomplete="one-time-code">
+        <input inputmode="numeric" pattern="[0-9]*" maxlength="1" aria-label="Dígito 2">
+        <input inputmode="numeric" pattern="[0-9]*" maxlength="1" aria-label="Dígito 3">
+        <input inputmode="numeric" pattern="[0-9]*" maxlength="1" aria-label="Dígito 4">
+        <input inputmode="numeric" pattern="[0-9]*" maxlength="1" aria-label="Dígito 5">
+        <input inputmode="numeric" pattern="[0-9]*" maxlength="1" aria-label="Dígito 6">
+      </div>
+      <div class="msg" id="msg" role="alert"></div>
+      <button type="submit" id="submitBtn" disabled>Ingresar</button>
+    </form>
+
+    <p class="note">El código solo funciona una vez. Después de ingresar, la sesión queda guardada en este dispositivo.</p>
+  </main>
+
+<script>
+(function(){
+  const boxes = Array.from(document.querySelectorAll('#codeBoxes input'));
+  const wrap = document.getElementById('codeBoxes');
+  const form = document.getElementById('loginForm');
+  const btn = document.getElementById('submitBtn');
+  const msg = document.getElementById('msg');
+
+  const getCode = () => boxes.map(b => b.value).join('');
+  const refresh = () => { btn.disabled = getCode().length !== 6; };
+
+  function fill(digits, from){
+    digits = digits.replace(/\D/g,'').slice(0, 6 - from);
+    digits.split('').forEach((d,i) => { boxes[from + i].value = d; });
+    const next = Math.min(from + digits.length, 5);
+    boxes[next].focus();
+    refresh();
+    if(getCode().length === 6) form.requestSubmit();
+  }
+
+  boxes.forEach((box, i) => {
+    box.addEventListener('input', () => {
+      wrap.classList.remove('error'); msg.textContent = '';
+      const v = box.value.replace(/\D/g,'');
+      box.value = '';
+      if(v) fill(v, i); else refresh();
+    });
+    box.addEventListener('keydown', e => {
+      if(e.key === 'Backspace' && !box.value && i > 0){ boxes[i-1].value=''; boxes[i-1].focus(); refresh(); e.preventDefault(); }
+      if(e.key === 'ArrowLeft' && i > 0) boxes[i-1].focus();
+      if(e.key === 'ArrowRight' && i < 5) boxes[i+1].focus();
+    });
+    box.addEventListener('paste', e => {
+      e.preventDefault();
+      fill((e.clipboardData || window.clipboardData).getData('text') || '', i);
+    });
+  });
+  boxes[0].focus();
+
+  let sending = false;
+  form.addEventListener('submit', async e => {
+    e.preventDefault();
+    const code = getCode();
+    if(code.length !== 6 || sending) return;
+    sending = true; btn.disabled = true; btn.textContent = 'Verificando…';
+    try{
+      const r = await fetch('/api/auth/redeem', {
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        credentials:'same-origin',
+        body: JSON.stringify({ code })
+      });
+      const data = await r.json().catch(() => ({}));
+      if(r.ok && data.ok){
+        msg.classList.add('ok'); msg.textContent = 'Código verificado ✓';
+        window.location.replace(data.redirect || '/home.html');
+        return;
+      }
+      throw new Error(data.error || 'No fue posible verificar el código.');
+    }catch(err){
+      msg.classList.remove('ok');
+      msg.textContent = err.message || 'Error de conexión.';
+      wrap.classList.add('error');
+      boxes.forEach(b => b.value = '');
+      boxes[0].focus();
+      btn.textContent = 'Ingresar';
+      sending = false; refresh();
+    }
+  });
+})();
+</script>
+</body>
+</html>

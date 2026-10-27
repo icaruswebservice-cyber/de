@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<base href="/">
+<link rel="icon" type="image/png" sizes="48x48" href="deriv-d-48.png">
+<link rel="icon" type="image/png" sizes="32x32" href="deriv-d-32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="deriv-d-16.png">
+<link rel="apple-touch-icon" href="deriv-d-180.png">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#ffffff">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Deriv Bot">
+<!-- Acelera la navegación hacia el bot-app (pestaña Chart): ver home.html. -->
+<link rel="preconnect" href="https://api.derivws.com" crossorigin>
+<link rel="dns-prefetch" href="https://api.derivws.com">
+<link rel="preconnect" href="https://auth.deriv.com">
+<link rel="dns-prefetch" href="https://auth.deriv.com">
+<link rel="prefetch" href="/">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Personal details | Deriv</title>
+<link rel="stylesheet" href="assets/sim/css/browser-frame.css?v=20261017zr">
+<link rel="stylesheet" href="assets/sim/css/deriv-desktop.css?v=20261017zr">
+<link rel="stylesheet" href="assets/sim/css/deriv-mobile.css?v=20261017zr" media="(max-width:860px)">
+<link rel="stylesheet" href="assets/sim/css/deriv-icons.css?v=20261017zr">
+</head>
+<body class="bf-static-page" data-page="profile" data-scene="/dashboard/profile/personal-details">
+<script src="assets/sim/js/sim-shared.js?v=20261017zr"></script>
+<script src="assets/sim/js/browser-frame.js?v=20261017zr"></script>
+<script>BrowserFrame.init();</script>
+<div class="dd-shell">
+  <div id="ddSidebar"></div>
+  <main class="dd-main">
+    <a class="dp-back" href="profile.html" aria-label="Volver"><i class="ic ic-pr_back"></i></a>
+    <h1 class="dp-title">Datos personales</h1>
+    <form class="dp-form" id="dpForm" autocomplete="off">
+      <label class="dp-field"><span>nombre</span><input id="dpNombre" type="text" maxlength="60"></label>
+      <label class="dp-field"><span>apellido</span><input id="dpApellido" type="text" maxlength="60"></label>
+      <label class="dp-field"><span>fecha de nacimiento</span><input id="dpFecha" type="text" value="" inputmode="numeric" maxlength="10" placeholder="dd/mm/aaaa"></label>
+      <label class="dp-field"><span>País de nacimiento</span><div class="dp-select"><em>co</em>Colombia<i class="ic ic-ex_chev"></i></div></label>
+      <label class="dp-field"><span>ciudadanía</span><div class="dp-select"><em>co</em>Colombia<i class="ic ic-ex_chev"></i></div></label>
+      <label class="dp-field"><span>Apodo</span><div class="dp-select dp-readonly"><b id="dpApodo"></b><svg viewBox="0 0 16 16" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><path d="m10.5 3 2.5 2.5-7 7H3.500V10z"/><path d="M2.500 14h11"/></svg></div></label>
+      <label class="dp-field"><span>Correo electrónico</span><input id="dpCorreo" type="email" maxlength="120" placeholder="tucorreo@ejemplo.com"></label>
+      <label class="dp-field"><span>Número de teléfono</span><input id="dpTel" type="tel" maxlength="20" inputmode="tel" placeholder="+57 300 000 0000"></label>
+      <div class="dp-actions"><span class="dp-msg" id="dpMsg"></span><button type="submit" class="dp-save" id="dpSave" disabled>Guardar</button></div>
+    </form>
+    <form class="dp-form dp-wd" id="wdForm2" autocomplete="off">
+      <h2 class="dp-sub">Retiros</h2>
+      <label class="dp-field"><span>Número de Nequi</span><input id="wdNequi" type="tel" inputmode="numeric" maxlength="12" placeholder="3001234567"></label>
+      <label class="dp-field"><span>Nombre del beneficiario</span><input id="wdName" type="text" maxlength="80" placeholder="Nombre completo"></label>
+      <label class="dp-field"><span>Cédula Ciudadanía (CC)</span><input id="wdCc" type="text" inputmode="numeric" maxlength="12" placeholder="1234567890"></label>
+      <label class="dp-field"><span>Número de cuenta</span><input id="wdAcc" type="text" inputmode="numeric" maxlength="20" placeholder="Número de cuenta"></label>
+      <div class="dp-actions"><span class="dp-msg" id="wdMsg2"></span><button type="submit" class="dp-save" id="wdSave2" disabled>Guardar</button></div>
+    </form>
+  </main>
+</div>
+<div id="ddBottomNav"></div>
+<script src="assets/sim/js/deriv-shell.js?v=20261017zr"></script>
+<script>
+  // Datos personales: el nombre y el correo guardados aparecen en la barra lateral (junto al avatar).
+  (function(){
+    var $ = function(id){ return document.getElementById(id); };
+    // Apodo simulado (aleatorio, solo en este navegador)
+    try { var ap = localStorage.getItem('tl_sim_nick'); if (!ap) { ap = 'client_' + Math.random().toString(36).slice(2, 12); localStorage.setItem('tl_sim_nick', ap); } $('dpApodo').textContent = ap; } catch(_) {}
+    var nom = $('dpNombre'), ape = $('dpApellido'), mail = $('dpCorreo'), tel = $('dpTel'), save = $('dpSave'), msg = $('dpMsg');
+    var initial = {};
+    function get(k){ try { return localStorage.getItem(k) || ''; } catch(_) { return ''; } }
+    function fill(full){
+      var parts = (full || '').trim().split(/\s+/);
+      nom.value = parts[0] || ''; ape.value = parts.slice(1).join(' ');
+      mail.value = get('tl_user_email_custom') || get('tl_user_email');
+      tel.value = get('tl_user_phone');
+      initial = { n: nom.value, a: ape.value, m: mail.value, t: tel.value }; dirty();
+    }
+    function dirty(){ save.disabled = (nom.value === initial.n && ape.value === initial.a && mail.value === initial.m && tel.value === initial.t); }
+    [nom, ape, mail, tel].forEach(function(el){ el.addEventListener('input', dirty); });
+    fill(get('tl_user_name_custom') || get('tl_user_name'));
+    document.addEventListener('dd:user', function(e){
+      if (get('tl_user_name_custom')) return;
+      var me = e.detail || {}; if (me.name && !nom.value) fill(me.name);
+    });
+    if (/[?&]need=phone/.test(location.search)) {
+      msg.textContent = 'Agrega tu número de teléfono para recibir el código de retiro.'; msg.className = 'dp-msg error';
+      setTimeout(function(){ tel.focus(); }, 300);
+    }
+    $('dpForm').addEventListener('submit', function(ev){
+      ev.preventDefault();
+      var m = mail.value.trim();
+      if (m && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(m)) { msg.textContent = 'Ingresa un correo válido'; msg.className = 'dp-msg error'; return; }
+      var t = tel.value.replace(/[\s().-]/g, '');
+      if (t && !/^\+?\d{7,15}$/.test(t)) { msg.textContent = 'Ingresa un teléfono válido (ej. +573001234567)'; msg.className = 'dp-msg error'; return; }
+      var full = (nom.value.trim() + ' ' + ape.value.trim()).trim();
+      try {
+        if (full) localStorage.setItem('tl_user_name_custom', full);
+        if (m) localStorage.setItem('tl_user_email_custom', m); else localStorage.removeItem('tl_user_email_custom');
+        if (t) localStorage.setItem('tl_user_phone', t); else localStorage.removeItem('tl_user_phone');
+      } catch(_) {}
+      var sn = $('ddUserName'), sm = $('ddUserMail');
+      if (sn && full) sn.textContent = full;
+      if (sm) sm.textContent = m || sm.textContent;
+      tel.value = t; initial = { n: nom.value, a: ape.value, m: mail.value, t: tel.value }; dirty();
+      msg.textContent = 'Guardado ✓'; msg.className = 'dp-msg';
+      setTimeout(function(){ msg.textContent = ''; }, 2200);
+    });
+  })();
+
+  // Datos de retiro: se guardan aquí y se muestran en Retirar USD antes de enviar la solicitud.
+  (function(){
+    var $ = function(id){ return document.getElementById(id); };
+    var f = { nequi: $('wdNequi'), name: $('wdName'), cc: $('wdCc'), account: $('wdAcc') }, save = $('wdSave2'), msg = $('wdMsg2'), initial = '';
+    function read(){ try { return JSON.parse(localStorage.getItem('tl_wd_info') || '{}') || {}; } catch(_) { return {}; } }
+    function snap(){ return JSON.stringify([f.nequi.value, f.name.value, f.cc.value, f.account.value]); }
+    var cur = read();
+    f.nequi.value = cur.nequi || ''; f.name.value = cur.name || ''; f.cc.value = cur.cc || ''; f.account.value = cur.account || '';
+    initial = snap(); save.disabled = true;
+    Object.keys(f).forEach(function(k){ f[k].addEventListener('input', function(){ save.disabled = (snap() === initial); }); });
+    if (/[?&]need=wd/.test(location.search)) {
+      msg.textContent = 'Agrega tus datos de retiro para poder enviar la solicitud.'; msg.className = 'dp-msg error';
+      setTimeout(function(){ f.nequi.scrollIntoView({block:'center'}); f.nequi.focus(); }, 300);
+    }
+    $('wdForm2').addEventListener('submit', function(ev){
+      ev.preventDefault();
+      var n = f.nequi.value.replace(/\D/g,''), nm = f.name.value.trim().replace(/\s+/g,' '), cc = f.cc.value.replace(/\D/g,''), ac = f.account.value.replace(/\D/g,'');
+      var err = !/^\d{10}$/.test(n) ? 'El número de Nequi debe tener 10 dígitos' : nm.length < 3 ? 'Ingresa el nombre del beneficiario' : !/^\d{6,12}$/.test(cc) ? 'Ingresa una cédula válida (6 a 12 dígitos)' : (f.account.value.trim() && !/^\d{6,20}$/.test(ac)) ? 'Número de cuenta no válido (6 a 20 dígitos)' : '';
+      if (err) { msg.textContent = err; msg.className = 'dp-msg error'; return; }
+      try { localStorage.setItem('tl_wd_info', JSON.stringify({ nequi: n, name: nm, cc: cc, account: ac || n })); } catch(_) {}
+      f.nequi.value = n; f.name.value = nm; f.cc.value = cc; f.account.value = ac || n;
+      initial = snap(); save.disabled = true;
+      msg.textContent = 'Guardado ✓'; msg.className = 'dp-msg';
+      setTimeout(function(){ msg.textContent = ''; }, 2200);
+    });
+  })();
+</script>
+</body>
+</html>

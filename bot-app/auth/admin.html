@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#181c25">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+<title>Administración · Cuentas</title>
+<style>
+  :root{
+    --bg-dark:#181c25;
+    --card:#20242f;
+    --field:#2a2e3a;
+    --line:#2f3442;
+    --red:#ff444f;
+    --red-dark:#e6222e;
+    --green:#00d0a3;
+    --text-light:#ffffff;
+    --text-muted:#9a9ca3;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    background:var(--bg-dark);color:var(--text-light);
+    -webkit-font-smoothing:antialiased;min-height:100dvh;
+  }
+  .wrap{max-width:560px;margin:0 auto;padding:24px 16px 48px;}
+  .card{background:var(--card);border-radius:18px;padding:22px 18px;margin-bottom:18px;box-shadow:0 14px 30px rgba(0,0,0,.25);}
+  header.top{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;}
+  header.top h1{font-size:20px;font-weight:700;}
+  h2{font-size:16px;font-weight:700;margin-bottom:14px;}
+  label{display:block;font-size:13px;color:var(--text-muted);margin:12px 0 6px;}
+  input{
+    width:100%;height:46px;border-radius:12px;border:1.5px solid transparent;
+    background:var(--field);color:var(--text-light);font-size:15px;padding:0 14px;outline:none;
+  }
+  input:focus{border-color:var(--red);}
+  .btn{
+    height:46px;border:0;border-radius:12px;padding:0 18px;
+    background:var(--red);color:#fff;font-size:15px;font-weight:700;cursor:pointer;
+  }
+  .btn:hover{background:var(--red-dark);}
+  .btn:disabled{opacity:.5;cursor:not-allowed;}
+  .btn.block{width:100%;margin-top:18px;}
+  .btn.ghost{background:transparent;border:1px solid var(--line);color:var(--text-muted);height:36px;font-size:13px;font-weight:600;padding:0 12px;}
+  .btn.ghost:hover{color:#fff;border-color:#4a5061;}
+  .msg{min-height:18px;font-size:13px;margin-top:10px;color:var(--red);}
+  .msg.ok{color:var(--green);}
+  .hidden{display:none !important;}
+  .row-2{display:grid;grid-template-columns:1fr 110px;gap:10px;}
+  .avatar{
+    width:38px;height:38px;border-radius:50%;background:#2a2c34;flex:0 0 38px;
+    display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;
+  }
+  .avatar.lg{width:56px;height:56px;flex-basis:56px;font-size:18px;margin:0 auto 8px;}
+  .preview{text-align:center;margin-top:6px;color:var(--text-muted);font-size:12px;}
+
+  .list-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;}
+  .count{color:var(--text-muted);font-size:13px;}
+  .empty{color:var(--text-muted);font-size:14px;text-align:center;padding:18px 0;}
+  .acc{border-top:1px solid var(--line);padding:14px 0;}
+  .acc:first-of-type{border-top:0;}
+  .acc-main{display:flex;align-items:center;gap:12px;}
+  .acc-name{flex:1;min-width:0;}
+  .acc-name strong{display:block;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .status{font-size:11px;font-weight:700;padding:2px 8px;border-radius:999px;display:inline-block;margin-top:3px;}
+  .status.free{background:rgba(0,208,163,.14);color:var(--green);}
+  .status.used{background:rgba(255,68,79,.14);color:var(--red);}
+  .acc-code{display:flex;align-items:center;gap:8px;margin-top:10px;}
+  .code-val{
+    flex:1;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+    font-size:22px;letter-spacing:6px;font-weight:700;background:var(--field);
+    border-radius:10px;padding:8px 12px;text-align:center;
+  }
+  .acc.is-used .code-val{text-decoration:line-through;opacity:.45;}
+  .info{margin-top:10px;background:var(--field);border-radius:12px;padding:12px 14px;font-size:13px;}
+  .info dl{display:grid;grid-template-columns:120px 1fr;gap:6px 10px;}
+  .info dt{color:var(--text-muted);}
+  .info dd{word-break:break-word;}
+  .toast{
+    position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(20px);
+    background:#fff;color:#1a1c22;font-size:14px;font-weight:600;padding:10px 18px;border-radius:999px;
+    opacity:0;transition:.2s;pointer-events:none;
+  }
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- ===== LOGIN ADMIN ===== -->
+  <section id="adminLogin" class="card hidden">
+    <h2>Panel administrativo</h2>
+    <form id="adminLoginForm" autocomplete="off">
+      <label for="adminPass">Contraseña de administrador</label>
+      <input id="adminPass" type="password" autocomplete="current-password" required>
+      <button class="btn block" type="submit">Entrar</button>
+      <div class="msg" id="adminLoginMsg"></div>
+    </form>
+  </section>
+
+  <!-- ===== PANEL ===== -->
+  <section id="panel" class="hidden">
+    <header class="top">
+      <h1>Administración</h1>
+      <button class="btn ghost" id="logoutBtn" type="button">Cerrar panel</button>
+    </header>
+
+    <div class="card">
+      <button class="btn block" id="toggleCreate" type="button" style="margin-top:0">+ Crear cuenta</button>
+
+      <form id="createForm" class="hidden" autocomplete="off" style="margin-top:6px">
+        <label for="name">Nombre</label>
+        <input id="name" maxlength="80" placeholder="Ej: Juan Ramírez" required>
+
+        <div class="row-2">
+          <div>
+            <label for="phone">Número de teléfono</label>
+            <input id="phone" type="tel" inputmode="tel" maxlength="25" placeholder="Ej: 300 123 4567" required>
+          </div>
+          <div>
+            <label for="initials">Iniciales</label>
+            <input id="initials" maxlength="3" placeholder="JR" style="text-transform:uppercase;text-align:center">
+          </div>
+        </div>
+
+        <div class="preview">
+          <div class="avatar lg" id="avatarPreview">?</div>
+          Así se verá el avatar en Home
+        </div>
+
+        <button class="btn block" type="submit" id="createBtn">Crear</button>
+        <div class="msg" id="createMsg"></div>
+      </form>
+    </div>
+
+    <div class="card">
+      <div class="list-head">
+        <h2 style="margin:0">Cuentas registradas</h2>
+        <span class="count" id="count"></span>
+      </div>
+      <div id="list"></div>
+    </div>
+  </section>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+(function(){
+  const $ = id => document.getElementById(id);
+  const api = async (url, opts = {}) => {
+    const r = await fetch(url, {
+      credentials:'same-origin',
+      headers: opts.body ? {'Content-Type':'application/json'} : {},
+      ...opts
+    });
+    const data = await r.json().catch(() => ({}));
+    if(!r.ok) { const e = new Error(data.error || 'Error'); e.status = r.status; throw e; }
+    return data;
+  };
+  const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const fmt = iso => iso ? new Date(iso).toLocaleString('es-CO', {dateStyle:'medium', timeStyle:'short'}) : '—';
+  const toast = t => { const el = $('toast'); el.textContent = t; el.classList.add('show'); clearTimeout(el._t); el._t = setTimeout(() => el.classList.remove('show'), 1800); };
+
+  function initialsFrom(name){
+    const p = name.trim().split(/\s+/).filter(Boolean);
+    if(!p.length) return '';
+    if(p.length === 1) return p[0].slice(0,2).toUpperCase();
+    return (p[0][0] + p[1][0]).toUpperCase();
+  }
+
+  // ---------- sesión admin ----------
+  async function boot(){
+    try{
+      const s = await api('/api/admin/session');
+      if(s.admin){ showPanel(); } else { $('adminLogin').classList.remove('hidden'); $('adminPass').focus(); }
+    }catch(_){ $('adminLogin').classList.remove('hidden'); }
+  }
+
+  $('adminLoginForm').addEventListener('submit', async e => {
+    e.preventDefault();
+    $('adminLoginMsg').textContent = '';
+    try{
+      await api('/api/admin/login', { method:'POST', body: JSON.stringify({ password: $('adminPass').value }) });
+      $('adminPass').value = '';
+      $('adminLogin').classList.add('hidden');
+      showPanel();
+    }catch(err){ $('adminLoginMsg').textContent = err.message; }
+  });
+
+  $('logoutBtn').addEventListener('click', async () => {
+    await api('/api/admin/logout', { method:'POST' }).catch(() => {});
+    location.reload();
+  });
+
+  function showPanel(){
+    $('panel').classList.remove('hidden');
+    loadList();
+  }
+
+  // ---------- crear cuenta ----------
+  let initialsTouched = false;
+  $('toggleCreate').addEventListener('click', () => {
+    const f = $('createForm');
+    f.classList.toggle('hidden');
+    $('toggleCreate').textContent = f.classList.contains('hidden') ? '+ Crear cuenta' : 'Cancelar';
+    if(!f.classList.contains('hidden')) $('name').focus();
+  });
+
+  function updatePreview(){
+    if(!initialsTouched) $('initials').value = initialsFrom($('name').value);
+    $('avatarPreview').textContent = $('initials').value.toUpperCase() || '?';
+  }
+  $('name').addEventListener('input', updatePreview);
+  $('initials').addEventListener('input', () => {
+    initialsTouched = $('initials').value.trim() !== '';
+    $('initials').value = $('initials').value.toUpperCase().replace(/[^A-ZÁÉÍÓÚÑÜ0-9]/g,'');
+    updatePreview();
+  });
+
+  $('createForm').addEventListener('submit', async e => {
+    e.preventDefault();
+    const m = $('createMsg'); m.className = 'msg'; m.textContent = '';
+    $('createBtn').disabled = true;
+    try{
+      const { account } = await api('/api/admin/accounts', {
+        method:'POST',
+        body: JSON.stringify({ name: $('name').value, phone: $('phone').value, initials: $('initials').value })
+      });
+      $('createForm').reset(); initialsTouched = false; updatePreview();
+      m.className = 'msg ok'; m.textContent = `Cuenta creada · código ${account.code}`;
+      await loadList(account.id);
+    }catch(err){
+      if(err.status === 401) return location.reload();
+      m.textContent = err.message;
+    }finally{ $('createBtn').disabled = false; }
+  });
+
+  // ---------- lista ----------
+  async function loadList(highlightId){
+    let accounts = [];
+    try{ ({ accounts } = await api('/api/admin/accounts')); }
+    catch(err){ if(err.status === 401) return location.reload(); $('list').innerHTML = `<p class="empty">${esc(err.message)}</p>`; return; }
+
+    $('count').textContent = accounts.length ? `${accounts.length} en total` : '';
+    if(!accounts.length){ $('list').innerHTML = '<p class="empty">Aún no hay cuentas registradas.</p>'; return; }
+
+    $('list').innerHTML = accounts.map(a => `
+      <div class="acc ${a.used ? 'is-used' : ''}" data-id="${esc(a.id)}">
+        <div class="acc-main">
+          <div class="avatar">${esc(a.initials)}</div>
+          <div class="acc-name">
+            <strong>${esc(a.name)}</strong>
+            <span class="status ${a.used ? 'used' : 'free'}">${a.used ? 'Código usado' : 'Disponible'}</span>
+          </div>
+        </div>
+        <div class="acc-code">
+          <div class="code-val">${esc(a.code)}</div>
+          <button class="btn ghost" data-copy="${esc(a.code)}" type="button">Copiar</button>
+        </div>
+        <div style="margin-top:8px">
+          <button class="btn ghost" data-info="${esc(a.id)}" type="button">Ver más información</button>
+        </div>
+        <div class="info hidden" id="info-${esc(a.id)}"></div>
+      </div>`).join('');
+
+    if(highlightId){
+      const el = document.querySelector(`.acc[data-id="${CSS.escape(highlightId)}"]`);
+      if(el) el.scrollIntoView({ behavior:'smooth', block:'center' });
+    }
+  }
+
+  $('list').addEventListener('click', async e => {
+    const copyBtn = e.target.closest('[data-copy]');
+    if(copyBtn){
+      const code = copyBtn.dataset.copy;
+      try{ await navigator.clipboard.writeText(code); }
+      catch(_){
+        const t = document.createElement('textarea'); t.value = code; document.body.appendChild(t);
+        t.select(); document.execCommand('copy'); t.remove();
+      }
+      toast('Código copiado: ' + code);
+      return;
+    }
+
+    const infoBtn = e.target.closest('[data-info]');
+    if(infoBtn){
+      const id = infoBtn.dataset.info;
+      const box = $('info-' + id);
+      if(!box.classList.contains('hidden')){ box.classList.add('hidden'); infoBtn.textContent = 'Ver más información'; return; }
+      try{
+        const { account: a } = await api('/api/admin/accounts/' + encodeURIComponent(id));
+        box.innerHTML = `<dl>
+          <dt>Nombre</dt><dd>${esc(a.name)}</dd>
+          <dt>Teléfono</dt><dd>${esc(a.phone)}</dd>
+          <dt>Iniciales</dt><dd>${esc(a.initials)}</dd>
+          <dt>Código</dt><dd>${esc(a.code)}</dd>
+          <dt>Creada</dt><dd>${fmt(a.createdAt)}</dd>
+          <dt>Estado</dt><dd>${a.used ? 'Usado (ya inició sesión)' : 'Disponible (sin usar)'}</dd>
+          <dt>Inició sesión</dt><dd>${fmt(a.usedAt)}</dd>
+          ${a.usedUserAgent ? `<dt>Dispositivo</dt><dd>${esc(a.usedUserAgent)}</dd>` : ''}
+        </dl>`;
+        box.classList.remove('hidden');
+        infoBtn.textContent = 'Ocultar información';
+      }catch(err){ if(err.status === 401) location.reload(); else toast(err.message); }
+    }
+  });
+
+  boot();
+})();
+</script>
+</body>
+</html>

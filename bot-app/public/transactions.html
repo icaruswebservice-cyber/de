@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<base href="/">
+<link rel="icon" type="image/png" sizes="48x48" href="deriv-d-48.png">
+<link rel="icon" type="image/png" sizes="32x32" href="deriv-d-32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="deriv-d-16.png">
+<link rel="apple-touch-icon" href="deriv-d-180.png">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#ffffff">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Deriv Bot">
+<!-- Acelera la navegación hacia el bot-app (pestaña Chart): ver home.html. -->
+<link rel="preconnect" href="https://api.derivws.com" crossorigin>
+<link rel="dns-prefetch" href="https://api.derivws.com">
+<link rel="preconnect" href="https://auth.deriv.com">
+<link rel="dns-prefetch" href="https://auth.deriv.com">
+<link rel="prefetch" href="/">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Transactions | Deriv</title>
+<link rel="stylesheet" href="assets/sim/css/browser-frame.css?v=20261017zr">
+<link rel="stylesheet" href="assets/sim/css/deriv-desktop.css?v=20261017zr">
+<link rel="stylesheet" href="assets/sim/css/deriv-mobile.css?v=20261017zr" media="(max-width:860px)">
+<link rel="stylesheet" href="assets/sim/css/deriv-icons.css?v=20261017zr">
+<link rel="stylesheet" href="assets/sim/css/deriv-withdraw.css?v=20261017zr">
+</head>
+<body class="bf-static-page" data-page="portfolio" data-scene="/dashboard/portfolio/transactions">
+<script src="assets/sim/js/sim-shared.js?v=20261017zr"></script>
+<script src="assets/sim/js/browser-frame.js?v=20261017zr"></script>
+<script>BrowserFrame.init();</script>
+<div class="dd-shell">
+  <div id="ddSidebar"></div>
+  <main class="dd-main">
+    <button class="tx-back" id="txBack" aria-label="Volver"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#111" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12H5M11 5.5 4.5 12 11 18.5"/></svg></button>
+    <h1 class="tx-title">Todas las transacciones <i class="ic ic-refresh" id="txRefresh" role="button" aria-label="Actualizar"></i></h1>
+    <div class="tx-list" id="txList"></div>
+  </main>
+</div>
+<div id="ddBottomNav"></div>
+<script src="assets/sim/js/deriv-shell.js?v=20261017zr"></script>
+<script>
+(function () {
+  var T = window.TradeLabSim, $ = function (id) { return document.getElementById(id); };
+  var NAMES = { options: 'Options', usd: 'Billetera' };
+  var MONTHS = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+  var ICONS = {
+    withdraw: '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><path d="M3 8h10"/></svg>',
+    deposit: '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"><path d="M3 8h10M8 3v10"/></svg>',
+    transfer: '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><path d="M2.500 5.500h10.500M10.500 3 13 5.500 10.500 8M13.500 10.500H3M5.500 8 3 10.500 5.500 13"/></svg>'
+  };
+  var TITLES = { withdraw: 'Retiro', deposit: 'Depósito', transfer: 'Transferir' };
+  function dayKey(ts) { var d = new Date(ts); return d.getFullYear() + '-' + d.getMonth() + '-' + d.getDate(); }
+  function dayLabel(ts) {
+    if (dayKey(ts) === dayKey(Date.now())) return 'hoy';
+    var d = new Date(ts); return d.getDate() + ' de ' + MONTHS[d.getMonth()] + ' de ' + d.getFullYear();
+  }
+  function paint() {
+    var list = T.loadTransactions(), box = $('txList'), html = '', last = '';
+    if (!list.length) { box.innerHTML = '<div class="tx-empty">Aún no tienes transacciones.</div>'; return; }
+    list.forEach(function (x) {
+      var lbl = dayLabel(x.ts);
+      if (lbl !== last) { html += '<div class="tx-date">' + lbl + '</div>'; last = lbl; }
+      var sub = x.type === 'transfer' ? '<small>' + (NAMES[x.from] || x.from) + ' → ' + (NAMES[x.to] || x.to) + '</small>' : '';
+      html += '<div class="tx-row"><span class="tx-ico">' + ICONS[x.type] + '</span><span class="tx-t"><b>' + TITLES[x.type] + '</b>' + sub + '</span>' +
+        '<span class="tx-a"><span data-hideable>' + Number(x.amount).toFixed(2) + '</span> USD<small' + (x.status === 'Procesando' ? ' class="proc"' : x.status === 'Cancelado' ? ' class="proc" style="color:#d6222f"' : '') + '>' + x.status + '</small></span></div>';
+    });
+    box.innerHTML = html;
+  }
+  try { if (location.protocol !== 'file:' && location.pathname !== '/dashboard/portfolio/transactions') history.replaceState(null, '', '/dashboard/portfolio/transactions'); } catch (_) {}
+  $('txBack').addEventListener('click', function () { window.location.href = 'portfolio.html'; });
+  $('txRefresh').addEventListener('click', paint);
+  window.addEventListener('tradelab-sim:balances-updated', paint);
+  paint(); setInterval(paint, 30000);
+})();
+</script>
+</body>
+</html>
