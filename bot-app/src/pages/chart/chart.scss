@@ -371,40 +371,57 @@
 
 // =====================================================================
 // SOLO COMPUTADOR (≥1280px): selector de mercado ("Volatility X Index") y su
-// panel de mercados. NADA de esto aplica a celular/tablet.
+// panel de mercados. NADA de esto aplica a celular/tablet (que queda igual
+// que antes).
 //
-// 1) Contorno turquesa del selector: borde fino de 1px en #85acb0 (el mismo
-//    tono que la librería usa solo cuando el menú está abierto), esquinas de
-//    4px y fondo oscuro, SIEMPRE visible — normal, hover, activo y
-//    desplegado — con el mismo grosor en todos los estados para que el
-//    selector nunca "salte" de tamaño (la librería cambiaba el borde entre
-//    #20242f, #999 y #85acb0, y el hover/activo no coincidían).
+// 1) Contorno del selector: el de la referencia — recuadro #20242f de 8px de
+//    relleno con esquinas de 4px, y dentro el botón #181c25 con borde fino de
+//    1px #20242f. El borde es SIEMPRE el mismo en normal, hover, activo y
+//    desplegado (la librería lo cambiaba entre #20242f, #999 y #85acb0, y por
+//    eso el selector "cambiaba y cambiaba" al pasar el mouse o abrirlo), y el
+//    ancho es fijo (antes variaba con el nombre del instrumento).
 // 2) Panel desplegable: la regla global de browser-frame.css lo ponía en
 //    position:fixed;left:0;right:0 (pensada para celular), así que en PC
 //    arrancaba en el borde izquierdo de la ventana, por DEBAJO de la barra
-//    lateral, y la columna de categorías quedaba cortada. Ahora (ver la
-//    media query de browser-frame.css) en PC cuelga del selector, y aquí se
-//    le da un alto que siempre cabe dentro de la gráfica.
+//    lateral, con las categorías cortadas. Ahora (ver la media query de
+//    browser-frame.css) en PC cuelga del selector, y aquí se le da un alto que
+//    siempre cabe dentro de la gráfica.
 // =====================================================================
 @media (min-width: 1280px) {
+    // Colores por tema (el borde coincide con el del recuadro, como en la referencia).
+    .dashboard__chart-wrapper:not(.dashboard__chart-wrapper--modal) .smartcharts-dark {
+        --sel-border: #20242f;
+
+        .cq-chart-title .cq-menu-btn {
+            background: #20242f;
+        }
+
+        .cq-chart-title .cq-symbol-select-btn {
+            background: #181c25;
+        }
+    }
+
+    .dashboard__chart-wrapper:not(.dashboard__chart-wrapper--modal) .smartcharts-light {
+        --sel-border: #fff;
+    }
+
     .dashboard__chart-wrapper:not(.dashboard__chart-wrapper--modal) {
         .cq-chart-title {
+            .cq-menu-btn {
+                padding: 8px !important;
+                border-radius: 4px;
+            }
+
             .cq-symbol-select-btn,
             .cq-symbol-select-btn:hover,
             &.stxMenuActive > .cq-menu-btn > .cq-symbol-select-btn {
                 box-sizing: border-box;
-                border: 1px solid #85acb0 !important;
+                border: 1px solid var(--sel-border) !important;
                 border-radius: 4px;
             }
 
-            .cq-menu-btn {
-                border-radius: 4px;
-            }
-
-            // Ancho fijo: antes el selector se ensanchaba o encogía según el nombre
-            // del instrumento ("Volatility 100 Index" -> "Volatility 75 (1s)
-            // Index"), moviendo todo lo que está a su alrededor. Con 27rem caben
-            // los nombres más largos ("Volatility 100 (1s) Index").
+            // Ancho fijo: con 27rem caben los nombres más largos
+            // ("Volatility 100 (1s) Index") sin que el selector cambie de tamaño.
             .cq-symbol-select-btn {
                 width: 27rem;
                 max-width: 100%;
@@ -426,42 +443,5 @@
                 }
             }
         }
-    }
-
-    // Tema oscuro: fondo oscuro del selector.
-    .dashboard__chart-wrapper:not(.dashboard__chart-wrapper--modal) .smartcharts-dark .cq-chart-title .cq-symbol-select-btn {
-        background: #181c25;
-    }
-}
-
-// =====================================================================
-// SOLO CELULAR/TABLET (<1280px): selector de mercado y lista de mercados.
-// NO lleva el contorno turquesa (eso es solo de computador).
-//  - El selector tiene ancho fijo (antes crecía/encogía según el nombre del
-//    instrumento y movía lo que había alrededor) y nunca pasa del ancho de la
-//    pantalla.
-//  - Las filas de la lista miden 44px (mínimo cómodo para dedo; la librería
-//    trae 40px).
-//  - El panel ya es a pantalla completa (regla en browser-frame.css); aquí se
-//    respeta el área segura inferior en iPhone.
-// =====================================================================
-@media (max-width: 1279px) {
-    .dashboard__chart-wrapper:not(.dashboard__chart-wrapper--modal) .cq-chart-title .cq-symbol-select-btn {
-        box-sizing: border-box;
-        width: 25.5rem;
-        max-width: calc(100vw - 3.2rem);
-
-        .cq-symbol-info {
-            flex: 1 1 auto;
-            min-width: 0;
-        }
-    }
-
-    .smartcharts-mobile .sc-mcd__item {
-        height: 4.4rem;
-    }
-
-    .smartcharts-mobile .cq-chart-title .cq-menu-dropdown .sc-mcd {
-        padding-bottom: env(safe-area-inset-bottom, 0);
     }
 }
