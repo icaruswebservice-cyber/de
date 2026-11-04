@@ -7,6 +7,20 @@
 
 export const DIALOG_LABEL = 'bot.deriv.me dice';
 
+// Estilo del cuadro de resultado del bot, elegido en Notificaciones > "Resultado del bot":
+//  - 'center' (predeterminado): cuadro en el centro de la pantalla.
+//  - 'top': cuadro arriba, como el aviso nativo de Chrome ("bot.deriv.me says").
+export const BOT_ALERT_STYLE_KEY = 'tradelab-bot-alert-style';
+export const DIALOG_LABEL_TOP = 'bot.deriv.me says';
+
+function getAlertStyle(): 'center' | 'top' {
+    try {
+        return window.localStorage.getItem(BOT_ALERT_STYLE_KEY) === 'top' ? 'top' : 'center';
+    } catch {
+        return 'center';
+    }
+}
+
 let overlayEl: HTMLDivElement | null = null;
 
 function buildOverlay(): {
@@ -134,6 +148,8 @@ function makeButton(text: string): HTMLButtonElement {
  * Custom replacement for window.alert().
  */
 export function showBotAlert(msg?: unknown): Promise<void> {
+    if (getAlertStyle() === 'top') return showTopAlert(msg);
+
     return new Promise(resolve => {
         const { box, message } = mount();
 
@@ -157,6 +173,95 @@ export function showBotAlert(msg?: unknown): Promise<void> {
         box.appendChild(actions);
 
         okButton.focus();
+    });
+}
+
+/**
+ * Aviso arriba, con el diseño del cuadro nativo de Chrome en modo oscuro.
+ */
+function showTopAlert(msg?: unknown): Promise<void> {
+    return new Promise(resolve => {
+        if (overlayEl) {
+            overlayEl.remove();
+            overlayEl = null;
+        }
+
+        const overlay = document.createElement('div');
+
+        overlay.setAttribute('data-testid', 'bot-dialog-overlay');
+        Object.assign(overlay.style, { position: 'fixed', inset: '0', zIndex: '99999', background: 'transparent' });
+
+        const box = document.createElement('div');
+
+        Object.assign(box.style, {
+            position: 'absolute',
+            top: '0',
+            left: '50%',
+            transform: 'translateX(-50%)',
+            width: 'calc(100% - 28px)',
+            maxWidth: '449px',
+            boxSizing: 'border-box',
+            padding: '20px 20px 20px',
+            background: '#1b1c1c',
+            border: '1px solid #454646',
+            borderRadius: '14px',
+            boxShadow: '0 4px 23px rgba(0, 0, 0, 0.55)',
+            fontFamily: 'Roboto, "Segoe UI", Arial, Helvetica, sans-serif',
+            color: '#e3e3e3',
+        });
+
+        const title = document.createElement('div');
+
+        title.textContent = DIALOG_LABEL_TOP;
+        Object.assign(title.style, { fontSize: '16px', fontWeight: '600', lineHeight: '22px', marginBottom: '9px' });
+
+        const message = document.createElement('div');
+
+        message.setAttribute('data-testid', 'bot-dialog-message');
+        message.textContent = msg === undefined ? '' : String(msg);
+        Object.assign(message.style, {
+            fontSize: '13px',
+            lineHeight: '18px',
+            whiteSpace: 'pre-wrap',
+            wordBreak: 'break-word',
+        });
+
+        const actions = document.createElement('div');
+
+        Object.assign(actions.style, { display: 'flex', justifyContent: 'flex-end', marginTop: '12px' });
+
+        const ok = document.createElement('button');
+
+        ok.type = 'button';
+        ok.textContent = 'OK';
+        Object.assign(ok.style, {
+            minWidth: '66px',
+            height: '36px',
+            margin: '4px 4px 4px 0',
+            padding: '0 16px',
+            border: '0',
+            borderRadius: '20px',
+            background: '#bdcdcf',
+            color: '#253553',
+            font: '500 14px Roboto, "Segoe UI", Arial, Helvetica, sans-serif',
+            cursor: 'pointer',
+            outline: 'none',
+            boxShadow: '0 0 0 2px #1b1c1c, 0 0 0 4px #bdcdcf',
+        });
+        ok.addEventListener('click', () => {
+            overlay.remove();
+            if (overlayEl === overlay) overlayEl = null;
+            resolve();
+        });
+
+        actions.appendChild(ok);
+        box.appendChild(title);
+        box.appendChild(message);
+        box.appendChild(actions);
+        overlay.appendChild(box);
+        overlayEl = overlay;
+        document.body.appendChild(overlay);
+        ok.focus();
     });
 }
 

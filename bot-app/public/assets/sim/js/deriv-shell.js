@@ -127,6 +127,10 @@
         '<label class="pp-radio"><input type="radio" name="ppWinMode" id="ppWinCustom"><span>Personalizada</span></label>' +
         '<input type="number" inputmode="decimal" min="0" max="100" step="0.1" class="balance-input" id="ppWinInput" placeholder="Porcentaje (0-100)" style="display:none;margin-top:0.625rem;">' +
         '<div class="balance-manager-feedback" id="ppWinFb"></div></div>' +
+      '<div class="balance-manager-card"><div class="balance-manager-header"><span class="balance-manager-name">Resultado del bot (móvil)</span></div>' +
+        '<label class="pp-radio"><input type="radio" name="ppBotAlert" id="ppBotAlertCenter"><span>En el centro (actual)</span></label>' +
+        '<label class="pp-radio"><input type="radio" name="ppBotAlert" id="ppBotAlertTop"><span>Arriba — como el aviso de Chrome (&ldquo;bot.deriv.me says&rdquo;)</span></label>' +
+        '<div class="balance-manager-feedback" id="ppBotAlertFb"></div></div>' +
       row('Demo', 'Cuenta Demo', 'USD', 'Monto en USD') + row('Virtual', 'Cuenta Real', 'USD (sim)', 'Monto virtual');
   }
 
@@ -148,6 +152,17 @@
       $('ppWinInput').style.display = def ? 'none' : 'block';
     }
     $('ppWinDefaultLabel').textContent = T.DEFAULT_WIN_PERCENT + '%';
+    // Estilo del cuadro de resultado del bot (lo lee el bot-app desde localStorage)
+    var BA = 'tradelab-bot-alert-style';
+    function readBA() { try { return localStorage.getItem(BA) === 'top' ? 'top' : 'center'; } catch (_) { return 'center'; } }
+    function paintBA() { var t = readBA() === 'top'; $('ppBotAlertTop').checked = t; $('ppBotAlertCenter').checked = !t; }
+    ['Center', 'Top'].forEach(function (k) {
+      $('ppBotAlert' + k).addEventListener('change', function () {
+        try { localStorage.setItem(BA, k === 'Top' ? 'top' : 'center'); } catch (_) {}
+        fb('ppBotAlertFb', 'Guardado ✓', false);
+      });
+    });
+    paintBA();
     root.querySelectorAll('.bal-btn').forEach(function (btn) {
       btn.addEventListener('click', function () {
         var acc = btn.dataset.account, input = $('pp' + (acc === 'demo' ? 'Demo' : 'Virtual') + 'Input');

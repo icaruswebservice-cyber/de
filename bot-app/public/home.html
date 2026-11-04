@@ -27,14 +27,14 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Home | Deriv</title>
 <meta name="description" content="Simulador educativo independiente. No es Deriv ni ninguna plataforma de trading real, y no gestiona dinero real.">
-<link rel="stylesheet" href="assets/sim/css/browser-frame.css?v=20261017zr">
-<link rel="stylesheet" href="assets/sim/css/deriv-desktop.css?v=20261017zr">
-<link rel="stylesheet" href="assets/sim/css/deriv-mobile.css?v=20261017zr" media="(max-width:860px)">
-<link rel="stylesheet" href="assets/sim/css/deriv-icons.css?v=20261017zr">
+<link rel="stylesheet" href="assets/sim/css/browser-frame.css?v=20261017zq">
+<link rel="stylesheet" href="assets/sim/css/deriv-desktop.css?v=20261017zq">
+<link rel="stylesheet" href="assets/sim/css/deriv-mobile.css?v=20261017zq" media="(max-width:860px)">
+<link rel="stylesheet" href="assets/sim/css/deriv-icons.css?v=20261017zq">
 </head>
 <body class="bf-static-page" data-page="home">
-<script src="assets/sim/js/sim-shared.js?v=20261017zr"></script>
-<script src="assets/sim/js/browser-frame.js?v=20261017zr"></script>
+<script src="assets/sim/js/sim-shared.js?v=20261017zq"></script>
+<script src="assets/sim/js/browser-frame.js?v=20261017zq"></script>
 <script>BrowserFrame.init();</script>
 
 <div class="dd-shell">
@@ -263,6 +263,18 @@
         <input type="number" inputmode="decimal" min="0" max="100" step="0.1" class="balance-input" id="winPercentInput" placeholder="Porcentaje (0-100)" style="display:none; margin-top:0.625rem;">
         <div class="balance-manager-feedback" id="winPercentFeedback"></div>
       </div>
+      <div class="balance-manager-card">
+        <div class="balance-manager-header"><span class="balance-manager-name">Resultado del bot (móvil)</span></div>
+        <label style="display:flex; align-items:center; gap:0.5rem; margin-bottom:0.625rem; cursor:pointer;">
+          <input type="radio" name="botAlertStyle" id="botAlertCenter" value="center">
+          <span style="font-size:0.875rem;">En el centro (actual)</span>
+        </label>
+        <label style="display:flex; align-items:center; gap:0.5rem; cursor:pointer;">
+          <input type="radio" name="botAlertStyle" id="botAlertTop" value="top">
+          <span style="font-size:0.875rem;">Arriba — como el aviso de Chrome (“bot.deriv.me says”)</span>
+        </label>
+        <div class="balance-manager-feedback" id="botAlertFeedback"></div>
+      </div>
 
       <div class="balance-manager-card">
         <div class="balance-manager-header">
@@ -296,7 +308,7 @@
 
 
 <script>window.TL_CUSTOM_EYE = true;</script>
-<script src="assets/sim/js/deriv-shell.js?v=20261017zr"></script>
+<script src="assets/sim/js/deriv-shell.js?v=20261017zq"></script>
 <script>
   // ===== PROMO AUTOPLAY CAROUSEL =====
   (function(){
@@ -471,6 +483,19 @@
     // Mantiene sincronizado si se cambia el saldo desde otra pestaña/página.
     window.addEventListener('tradelab-sim:balances-updated', () => refreshBalances());
     window.addEventListener('storage', (e) => { if(e.key === TradeLabSim.STORAGE_KEY) refreshBalances(); });
+
+    // ===== Estilo del cuadro de resultado del bot =====
+    (function(){
+      const KEY = 'tradelab-bot-alert-style';
+      const c = document.getElementById('botAlertCenter'), t = document.getElementById('botAlertTop'), fbk = document.getElementById('botAlertFeedback');
+      if(!c || !t) return;
+      let cur = 'center'; try { cur = localStorage.getItem(KEY) === 'top' ? 'top' : 'center'; } catch(_) {}
+      t.checked = cur === 'top'; c.checked = cur !== 'top';
+      [[c,'center'],[t,'top']].forEach(([el,val]) => el.addEventListener('change', () => {
+        try { localStorage.setItem(KEY, val); } catch(_) {}
+        if(fbk){ fbk.textContent = 'Guardado ✓'; fbk.classList.add('show'); setTimeout(() => fbk.classList.remove('show'), 2200); }
+      }));
+    })();
 
     // ===== Porcentaje de ganancia =====
     (function(){
