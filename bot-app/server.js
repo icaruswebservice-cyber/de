@@ -8,8 +8,9 @@
  *                    Si ya hay sesión válida, redirige a /home.html (nunca
  *                    vuelve a mostrarse).
  *  - /admin        → panel administrativo (protegido con ADMIN_PASSWORD):
- *                    crear cuentas (con opción de inicio de sesión temporal de
- *                    10 minutos), ver lista, copiar código, ver más info.
+ *                    crear cuentas (con opción de inicio de sesión temporal,
+ *                    15 minutos por defecto y ajustable), ver lista, copiar
+ *                    código, ver más info.
  *  - /api/...      → API usada por login.html, admin.html y home.html.
  *  - todo lo demás → archivos de dist/ (home.html, options.html, app React…)
  *                    únicamente con sesión válida.
@@ -59,7 +60,16 @@ const USER_COOKIE = 'tl_session';
 const ADMIN_COOKIE = 'tl_admin';
 const USER_SESSION_MAX_AGE = 60 * 60 * 24 * 365 * 10; // 10 años: una sola vez y listo
 const ADMIN_SESSION_MAX_AGE = 60 * 60 * 12; // 12 horas
-const TEMP_SESSION_MS = 10 * 60 * 1000; // sesión temporal: 10 minutos desde que inicia sesión
+const DEFAULT_TEMP_MINUTES = 15; // sesión temporal: 15 minutos por defecto (ajustable por cuenta en /admin)
+const MIN_TEMP_MINUTES = 1;
+const MAX_TEMP_MINUTES = 1440; // tope: 24 horas
+
+// Normaliza los minutos recibidos: entero entre MIN y MAX; si no es válido → 15.
+function normalizeTempMinutes(v) {
+    const n = Math.round(Number(v));
+    if (!Number.isFinite(n)) return DEFAULT_TEMP_MINUTES;
+    return Math.min(MAX_TEMP_MINUTES, Math.max(MIN_TEMP_MINUTES, n));
+}
 
 if (!DATABASE_URL) fs.mkdirSync(DATA_DIR, { recursive: true });
 
@@ -111,6 +121,7 @@ function rowToAccount(r) {
         usedFromIp: r.used_ip || null,
         usedUserAgent: r.used_user_agent || null,
         temporary: !!r.temporary,
+        tempMinutes: normalizeTempMinutes(r.temp_minutes || DEFAULT_TEMP_MINUTES),
     };
 }
 
@@ -151,6 +162,7 @@ function createPgStore(url) {
                 )`);
             // Cuentas ya existentes: agrega la columna sin tocar los datos.
             await pool.query('ALTER TABLE accounts ADD COLUMN IF NOT EXISTS temporary BOOLEAN NOT NULL DEFAULT false');
+            await pool.query('ALTER TABLE accounts ADD COLUMN IF NOT EXISTS temp_minutes INTEGER NOT NULL DEFAULT 15');
         },
         async list() {
             const { rows } = await pool.query('SELECT * FROM accounts ORDER BY created_at DESC');
@@ -160,14 +172,14 @@ function createPgStore(url) {
             const { rows } = await pool.query('SELECT * FROM accounts WHERE id = $1', [id]);
             return rowToAccount(rows[0]);
         },
-        async create({ name, phone, initials, temporary }) {
+        async create({ name, phone, initials, temporary, tempMinutes }) {
             for (let i = 0; i < 20; i++) {
                 const code = randomCode();
                 try {
                     const { rows } = await pool.query(
-                        `INSERT INTO accounts (id, name, phone, initials, code, temporary)
-                         VALUES ($1, $2, $3, $4, $5, $6) RETURNING *`,
-                        [crypto.randomUUID(), name, phone, initials, code, !!temporary]
+                        `INSERT INTO accounts (id, name, phone, initials, code, temporary, temp_minutes)
+                         VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *`,
+                        [crypto.randomUUID(), name, phone, initials, code, !!temporary, normalizeTempMinutes(tempMinutes)]
                     );
                     return rowToAccount(rows[0]);
                 } catch (err) {
@@ -212,7 +224,7 @@ function createFileStore(file) {
         async getById(id) {
             return data.accounts.find(a => a.id === id) || null;
         },
-        async create({ name, phone, initials, temporary }) {
+        async create({ name, phone, initials, temporary, tempMinutes }) {
             const inUse = new Set(data.accounts.map(a => a.code));
             let code;
             do code = randomCode();
@@ -226,6 +238,7 @@ function createFileStore(file) {
                 createdAt: new Date().toISOString(),
                 usedAt: null,
                 temporary: !!temporary,
+                tempMinutes: normalizeTempMinutes(tempMinutes),
             };
             data.accounts.push(account);
             save();
@@ -271,6 +284,7 @@ function publicAccount(a) {
         used: !!a.usedAt,
         usedAt: a.usedAt || null,
         temporary: !!a.temporary,
+        tempMinutes: normalizeTempMinutes(a.tempMinutes || DEFAULT_TEMP_MINUTES),
     };
 }
 
@@ -603,8 +617,10 @@ async function handleApi(req, res, pathname) {
         }
         const account = result.account;
 
-        // Cuenta temporal: la sesión vence a los 10 minutos (lo verifica el servidor).
+        // Cuenta temporal: la sesión vence según los minutos configurados en /admin
+        // (15 por defecto). Lo verifica el servidor.
         const temporary = !!account.temporary;
+        const tempMs = normalizeTempMinutes(account.tempMinutes) * 60 * 1000;
         const now = Date.now();
         const token = sign({
             t: 'user',
@@ -612,7 +628,7 @@ async function handleApi(req, res, pathname) {
             n: account.name,
             i: account.initials,
             iat: now,
-            ...(temporary ? { tmp: 1, exp: now + TEMP_SESSION_MS } : {}),
+            ...(temporary ? { tmp: 1, exp: now + tempMs } : {}),
         });
         return sendJson(
             res,
@@ -622,7 +638,7 @@ async function handleApi(req, res, pathname) {
                 'Set-Cookie': cookieString(
                     USER_COOKIE,
                     token,
-                    temporary ? Math.ceil(TEMP_SESSION_MS / 1000) : USER_SESSION_MAX_AGE,
+                    temporary ? Math.ceil(tempMs / 1000) : USER_SESSION_MAX_AGE,
                     req
                 ),
             }
@@ -716,7 +732,8 @@ async function handleApi(req, res, pathname) {
             if (!initials) initials = makeInitials(name);
 
             const temporary = body.temporary === true || body.temporary === 'true' || body.temporary === 'si';
-            const account = await store.create({ name, phone, initials, temporary });
+            const tempMinutes = normalizeTempMinutes(body.tempMinutes);
+            const account = await store.create({ name, phone, initials, temporary, tempMinutes });
             return sendJson(res, 201, { account: publicAccount(account) });
         }
 
