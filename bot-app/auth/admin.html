@@ -78,6 +78,17 @@
   .info dl{display:grid;grid-template-columns:120px 1fr;gap:6px 10px;}
   .info dt{color:var(--text-muted);}
   .info dd{word-break:break-word;}
+  .seg{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+  .seg input{position:absolute;opacity:0;width:0;height:0;pointer-events:none;}
+  .seg label{
+    margin:0;height:44px;display:flex;align-items:center;justify-content:center;
+    border-radius:12px;background:var(--field);border:1.5px solid transparent;
+    color:var(--text-muted);font-size:14px;font-weight:700;cursor:pointer;
+  }
+  .seg input:checked + label{border-color:var(--red);color:#fff;background:rgba(255,68,79,.14);}
+  .seg input:focus-visible + label{outline:2px solid var(--red);outline-offset:2px;}
+  .hint{font-size:12px;color:var(--text-muted);margin-top:6px;line-height:1.4;}
+  .status.temp{background:rgba(255,184,0,.14);color:#ffb800;margin-left:6px;}
   .toast{
     position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(20px);
     background:#fff;color:#1a1c22;font-size:14px;font-weight:600;padding:10px 18px;border-radius:999px;
@@ -124,6 +135,15 @@
             <input id="initials" maxlength="3" placeholder="JR" style="text-transform:uppercase;text-align:center">
           </div>
         </div>
+
+        <label>Inicio de sesión temporal</label>
+        <div class="seg" role="radiogroup" aria-label="Inicio de sesión temporal">
+          <input type="radio" name="temporary" id="tempNo" value="no" checked>
+          <label for="tempNo">No</label>
+          <input type="radio" name="temporary" id="tempYes" value="si">
+          <label for="tempYes">Sí</label>
+        </div>
+        <div class="hint">Con “Sí”, el acceso dura 10 minutos desde que la persona ingresa el código. Al terminar, la página se recarga, la sesión se cierra y vuelve a pedir acceso.</div>
 
         <div class="preview">
           <div class="avatar lg" id="avatarPreview">?</div>
@@ -227,10 +247,15 @@
     try{
       const { account } = await api('/api/admin/accounts', {
         method:'POST',
-        body: JSON.stringify({ name: $('name').value, phone: $('phone').value, initials: $('initials').value })
+        body: JSON.stringify({
+          name: $('name').value,
+          phone: $('phone').value,
+          initials: $('initials').value,
+          temporary: $('tempYes').checked
+        })
       });
       $('createForm').reset(); initialsTouched = false; updatePreview();
-      m.className = 'msg ok'; m.textContent = `Cuenta creada · código ${account.code}`;
+      m.className = 'msg ok'; m.textContent = `Cuenta creada${account.temporary ? ' (temporal · 10 min)' : ''} · código ${account.code}`;
       await loadList(account.id);
     }catch(err){
       if(err.status === 401) return location.reload();
@@ -253,7 +278,7 @@
           <div class="avatar">${esc(a.initials)}</div>
           <div class="acc-name">
             <strong>${esc(a.name)}</strong>
-            <span class="status ${a.used ? 'used' : 'free'}">${a.used ? 'Código usado' : 'Disponible'}</span>
+            <span class="status ${a.used ? 'used' : 'free'}">${a.used ? 'Código usado' : 'Disponible'}</span>${a.temporary ? '<span class="status temp">Temporal · 10 min</span>' : ''}
           </div>
         </div>
         <div class="acc-code">
@@ -298,6 +323,7 @@
           <dt>Iniciales</dt><dd>${esc(a.initials)}</dd>
           <dt>Código</dt><dd>${esc(a.code)}</dd>
           <dt>Creada</dt><dd>${fmt(a.createdAt)}</dd>
+          <dt>Tipo de acceso</dt><dd>${a.temporary ? 'Temporal (10 minutos)' : 'Permanente'}</dd>
           <dt>Estado</dt><dd>${a.used ? 'Usado (ya inició sesión)' : 'Disponible (sin usar)'}</dd>
           <dt>Inició sesión</dt><dd>${fmt(a.usedAt)}</dd>
           ${a.usedUserAgent ? `<dt>Dispositivo</dt><dd>${esc(a.usedUserAgent)}</dd>` : ''}

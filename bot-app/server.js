@@ -8,7 +8,8 @@
  *                    Si ya hay sesión válida, redirige a /home.html (nunca
  *                    vuelve a mostrarse).
  *  - /admin        → panel administrativo (protegido con ADMIN_PASSWORD):
- *                    crear cuentas, ver lista, copiar código, ver más info.
+ *                    crear cuentas (con opción de inicio de sesión temporal de
+ *                    10 minutos), ver lista, copiar código, ver más info.
  *  - /api/...      → API usada por login.html, admin.html y home.html.
  *  - todo lo demás → archivos de dist/ (home.html, options.html, app React…)
  *                    únicamente con sesión válida.
@@ -58,6 +59,7 @@ const USER_COOKIE = 'tl_session';
 const ADMIN_COOKIE = 'tl_admin';
 const USER_SESSION_MAX_AGE = 60 * 60 * 24 * 365 * 10; // 10 años: una sola vez y listo
 const ADMIN_SESSION_MAX_AGE = 60 * 60 * 12; // 12 horas
+const TEMP_SESSION_MS = 10 * 60 * 1000; // sesión temporal: 10 minutos desde que inicia sesión
 
 if (!DATABASE_URL) fs.mkdirSync(DATA_DIR, { recursive: true });
 
@@ -108,6 +110,7 @@ function rowToAccount(r) {
         usedAt: iso(r.used_at),
         usedFromIp: r.used_ip || null,
         usedUserAgent: r.used_user_agent || null,
+        temporary: !!r.temporary,
     };
 }
 
@@ -146,6 +149,8 @@ function createPgStore(url) {
                     used_ip         TEXT,
                     used_user_agent TEXT
                 )`);
+            // Cuentas ya existentes: agrega la columna sin tocar los datos.
+            await pool.query('ALTER TABLE accounts ADD COLUMN IF NOT EXISTS temporary BOOLEAN NOT NULL DEFAULT false');
         },
         async list() {
             const { rows } = await pool.query('SELECT * FROM accounts ORDER BY created_at DESC');
@@ -155,14 +160,14 @@ function createPgStore(url) {
             const { rows } = await pool.query('SELECT * FROM accounts WHERE id = $1', [id]);
             return rowToAccount(rows[0]);
         },
-        async create({ name, phone, initials }) {
+        async create({ name, phone, initials, temporary }) {
             for (let i = 0; i < 20; i++) {
                 const code = randomCode();
                 try {
                     const { rows } = await pool.query(
-                        `INSERT INTO accounts (id, name, phone, initials, code)
-                         VALUES ($1, $2, $3, $4, $5) RETURNING *`,
-                        [crypto.randomUUID(), name, phone, initials, code]
+                        `INSERT INTO accounts (id, name, phone, initials, code, temporary)
+                         VALUES ($1, $2, $3, $4, $5, $6) RETURNING *`,
+                        [crypto.randomUUID(), name, phone, initials, code, !!temporary]
                     );
                     return rowToAccount(rows[0]);
                 } catch (err) {
@@ -207,7 +212,7 @@ function createFileStore(file) {
         async getById(id) {
             return data.accounts.find(a => a.id === id) || null;
         },
-        async create({ name, phone, initials }) {
+        async create({ name, phone, initials, temporary }) {
             const inUse = new Set(data.accounts.map(a => a.code));
             let code;
             do code = randomCode();
@@ -220,6 +225,7 @@ function createFileStore(file) {
                 code,
                 createdAt: new Date().toISOString(),
                 usedAt: null,
+                temporary: !!temporary,
             };
             data.accounts.push(account);
             save();
@@ -264,6 +270,7 @@ function publicAccount(a) {
         createdAt: a.createdAt,
         used: !!a.usedAt,
         usedAt: a.usedAt || null,
+        temporary: !!a.temporary,
     };
 }
 
@@ -438,7 +445,24 @@ const MIME = {
 };
 const COMPRESSIBLE = /^(text\/|application\/(javascript|json|manifest\+json|xml|wasm)|image\/svg\+xml)/;
 
-function sendFile(req, res, filePath, extraHeaders) {
+// Si injectTimer es true y el archivo es HTML, se le agrega el cronómetro de
+// sesión temporal (auth/temp-timer.js) justo antes de </body>.
+const TIMER_TAG = '<script src="/__temp-timer.js"></script>';
+function sendHtmlWithTimer(res, filePath, headers) {
+    fs.readFile(filePath, 'utf8', (err, html) => {
+        if (err) {
+            res.writeHead(404, { ...SECURITY_HEADERS, 'Content-Type': 'text/plain; charset=utf-8' });
+            return res.end('404');
+        }
+        const i = html.lastIndexOf('</body>');
+        const out = i >= 0 ? html.slice(0, i) + TIMER_TAG + html.slice(i) : html + TIMER_TAG;
+        const buf = Buffer.from(out, 'utf8');
+        res.writeHead(200, { ...headers, 'Content-Length': buf.length });
+        res.end(buf);
+    });
+}
+
+function sendFile(req, res, filePath, extraHeaders, injectTimer) {
     fs.stat(filePath, (err, stat) => {
         if (err || !stat.isFile()) {
             res.writeHead(404, { ...SECURITY_HEADERS, 'Content-Type': 'text/plain; charset=utf-8' });
@@ -457,6 +481,10 @@ function sendFile(req, res, filePath, extraHeaders) {
             Vary: 'Cookie, Accept-Encoding',
             ...(extraHeaders || {}),
         };
+
+        if (injectTimer && isHtml && req.method !== 'HEAD') {
+            return sendHtmlWithTimer(res, filePath, headers);
+        }
 
         if (req.method === 'HEAD') {
             headers['Content-Length'] = stat.size;
@@ -575,18 +603,29 @@ async function handleApi(req, res, pathname) {
         }
         const account = result.account;
 
+        // Cuenta temporal: la sesión vence a los 10 minutos (lo verifica el servidor).
+        const temporary = !!account.temporary;
+        const now = Date.now();
         const token = sign({
             t: 'user',
             aid: account.id,
             n: account.name,
             i: account.initials,
-            iat: Date.now(),
+            iat: now,
+            ...(temporary ? { tmp: 1, exp: now + TEMP_SESSION_MS } : {}),
         });
         return sendJson(
             res,
             200,
             { ok: true, redirect: '/home.html' },
-            { 'Set-Cookie': cookieString(USER_COOKIE, token, USER_SESSION_MAX_AGE, req) }
+            {
+                'Set-Cookie': cookieString(
+                    USER_COOKIE,
+                    token,
+                    temporary ? Math.ceil(TEMP_SESSION_MS / 1000) : USER_SESSION_MAX_AGE,
+                    req
+                ),
+            }
         );
     }
 
@@ -603,6 +642,9 @@ async function handleApi(req, res, pathname) {
         return sendJson(res, 200, {
             name: acc ? acc.name : s.n,
             initials: acc ? acc.initials : s.i,
+            temporary: !!s.tmp,
+            expiresAt: s.tmp ? s.exp : null,
+            now: Date.now(),
         });
     }
 
@@ -673,7 +715,8 @@ async function handleApi(req, res, pathname) {
             }
             if (!initials) initials = makeInitials(name);
 
-            const account = await store.create({ name, phone, initials });
+            const temporary = body.temporary === true || body.temporary === 'true' || body.temporary === 'si';
+            const account = await store.create({ name, phone, initials, temporary });
             return sendJson(res, 201, { account: publicAccount(account) });
         }
 
@@ -730,6 +773,13 @@ const server = http.createServer(async (req, res) => {
             return res.end('No autorizado');
         }
 
+        // Cronómetro de sesión temporal (se inyecta en el HTML solo a cuentas temporales).
+        const session = getUserSession(req);
+        const injectTimer = !!session.tmp;
+        if (pathname === '/__temp-timer.js') {
+            return sendFile(req, res, path.join(AUTH_DIR, 'temp-timer.js'), { 'Cache-Control': 'no-cache' });
+        }
+
         // Rutas "bonitas" de cada escena (la barra de direcciones las muestra tras cargar la página).
         const SCENE_ROUTES = {
             '/dashboard': '/home.html',
@@ -755,13 +805,13 @@ const server = http.createServer(async (req, res) => {
         }
 
         fs.stat(target, (err, stat) => {
-            if (!err && stat.isFile()) return sendFile(req, res, target);
+            if (!err && stat.isFile()) return sendFile(req, res, target, undefined, injectTimer);
             if (!err && stat.isDirectory()) {
                 const idx = path.join(target, 'index.html');
-                if (fs.existsSync(idx)) return sendFile(req, res, idx);
+                if (fs.existsSync(idx)) return sendFile(req, res, idx, undefined, injectTimer);
             }
             // Fallback SPA: las rutas internas de React caen en index.html
-            if (!path.extname(pathname)) return sendFile(req, res, path.join(DIST_DIR, 'index.html'));
+            if (!path.extname(pathname)) return sendFile(req, res, path.join(DIST_DIR, 'index.html'), undefined, injectTimer);
             res.writeHead(404, { ...SECURITY_HEADERS, 'Content-Type': 'text/plain; charset=utf-8' });
             res.end('404');
         });
